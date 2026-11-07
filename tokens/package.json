@@ -38,7 +38,7 @@
     "build": "node scripts/build.ts && tsc6 -p tsconfig.build.json",
     "test": "vitest run",
     "test:typecheck": "tsc6 --noEmit",
-    "prepublishOnly": "pnpm build && pnpm test"
+    "prepublishOnly": "node scripts/build.ts && tsc6 -p tsconfig.build.json && vitest run"
   },
   "peerDependencies": {
     "@fontsource/ibm-plex-sans": "^5.0.0"
