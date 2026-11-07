@@ -1,0 +1,314 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`generated CSS > base.css 1`] = `
+"/* @unitae/tokens 0.0.0 — base element styles (optional)
+   Generated from src/tokens.ts. Do not edit by hand. */
+
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--u-border);
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    background-color: var(--u-bg);
+    color: var(--u-fg);
+    font-family: var(--u-font-sans);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after,
+  ::backdrop {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+"
+`;
+
+exports[`generated CSS > theme.css 1`] = `
+"/* @unitae/tokens 0.0.0 — Tailwind v4 theme
+   Generated from src/tokens.ts. Do not edit by hand. */
+
+@import "./tokens.css";
+
+@theme inline {
+  --color-background: var(--u-bg);
+  --color-foreground: var(--u-fg);
+  --color-card: var(--u-surface);
+  --color-card-foreground: var(--u-fg);
+  --color-popover: var(--u-surface);
+  --color-popover-foreground: var(--u-fg);
+  --color-primary: var(--u-primary);
+  --color-primary-foreground: var(--u-primary-fg);
+  --color-secondary: var(--u-hover);
+  --color-secondary-foreground: var(--u-fg);
+  --color-muted: var(--u-hover);
+  --color-muted-foreground: var(--u-fg-muted);
+  --color-accent: var(--u-hover);
+  --color-accent-foreground: var(--u-fg);
+  --color-destructive: var(--u-danger);
+  --color-destructive-foreground: var(--u-danger-fg);
+  --color-border: var(--u-border);
+  --color-input: var(--u-input);
+  --color-ring: var(--u-ring);
+  --color-chart-1: var(--u-cat-1);
+  --color-chart-2: var(--u-cat-2);
+  --color-chart-3: var(--u-cat-3);
+  --color-chart-4: var(--u-cat-4);
+  --color-chart-5: var(--u-cat-5);
+  --color-chart-6: var(--u-cat-6);
+  --color-chart-7: var(--u-cat-7);
+  --color-chart-8: var(--u-cat-8);
+  --color-sidebar: var(--u-subtle);
+  --color-sidebar-foreground: var(--u-fg);
+  --color-sidebar-primary: var(--u-primary);
+  --color-sidebar-primary-foreground: var(--u-primary-fg);
+  --color-sidebar-accent: var(--u-selected);
+  --color-sidebar-accent-foreground: var(--u-fg);
+  --color-sidebar-border: var(--u-border);
+  --color-sidebar-ring: var(--u-ring);
+  --color-surface: var(--u-surface);
+  --color-subtle: var(--u-subtle);
+  --color-hover: var(--u-hover);
+  --color-selected: var(--u-selected);
+  --color-border-strong: var(--u-border-strong);
+  --color-faint: var(--u-fg-faint);
+  --color-brand: var(--u-accent);
+  --color-brand-text: var(--u-accent-text);
+  --color-brand-soft: var(--u-accent-soft);
+  --color-success: var(--u-success);
+  --color-success-text: var(--u-success-text);
+  --color-success-soft: var(--u-success-soft);
+  --color-warning: var(--u-warning);
+  --color-warning-text: var(--u-warning-text);
+  --color-warning-soft: var(--u-warning-soft);
+  --color-danger: var(--u-danger);
+  --color-danger-text: var(--u-danger-text);
+  --color-danger-soft: var(--u-danger-soft);
+  --color-chart-other: var(--u-cat-other);
+  --color-chart-muted: var(--u-chart-muted);
+  --color-chart-context: var(--u-chart-context);
+  --color-chart-grid: var(--u-chart-grid);
+  --color-chart-axis: var(--u-chart-axis);
+  --color-ink-on-chart-1: var(--u-ink-on-cat-1);
+  --color-ink-on-success: var(--u-ink-on-success);
+  --color-ink-on-warning: var(--u-ink-on-warning);
+  --color-ink-on-chart-other: var(--u-ink-on-other);
+  --color-seq-100: var(--u-seq-100);
+  --color-seq-150: var(--u-seq-150);
+  --color-seq-200: var(--u-seq-200);
+  --color-seq-250: var(--u-seq-250);
+  --color-seq-300: var(--u-seq-300);
+  --color-seq-350: var(--u-seq-350);
+  --color-seq-400: var(--u-seq-400);
+  --color-seq-450: var(--u-seq-450);
+  --color-seq-500: var(--u-seq-500);
+  --color-seq-550: var(--u-seq-550);
+  --color-seq-600: var(--u-seq-600);
+  --color-seq-650: var(--u-seq-650);
+  --color-seq-700: var(--u-seq-700);
+  --color-section-treasures: var(--u-section-treasures);
+  --color-section-ministry: var(--u-section-ministry);
+  --color-section-living: var(--u-section-living);
+  --font-sans: var(--u-font-sans);
+  --font-display: var(--u-font-sans);
+  --font-mono: var(--u-font-mono);
+  --radius: var(--u-radius);
+  --radius-xs: var(--u-radius-xs);
+  --radius-sm: var(--u-radius-sm);
+  --radius-md: var(--u-radius-md);
+  --radius-lg: var(--u-radius-lg);
+  --radius-xl: var(--u-radius-xl);
+  --radius-2xl: var(--u-radius-2xl);
+  --radius-3xl: var(--u-radius-3xl);
+  --shadow-2xs: var(--u-shadow-2xs);
+  --shadow-xs: var(--u-shadow-xs);
+  --shadow-sm: var(--u-shadow-sm);
+  --shadow-md: var(--u-shadow-md);
+  --shadow-lg: var(--u-shadow-lg);
+  --shadow-xl: var(--u-shadow-xl);
+  --shadow-2xl: var(--u-shadow-2xl);
+  --ease-standard: var(--u-ease);
+  --default-transition-duration: var(--u-duration-fast);
+  --default-transition-timing-function: var(--u-ease);
+}
+"
+`;
+
+exports[`generated CSS > tokens.css 1`] = `
+"/* @unitae/tokens 0.0.0 — raw tokens
+   Generated from src/tokens.ts. Do not edit by hand. */
+
+:root {
+  color-scheme: light;
+  --u-bg: oklch(0.985 0.002 265);
+  --u-surface: oklch(1 0 0);
+  --u-subtle: oklch(0.968 0.003 265);
+  --u-hover: oklch(0.948 0.004 265);
+  --u-selected: oklch(0.925 0.008 250);
+  --u-border: oklch(0.912 0.004 265);
+  --u-border-strong: oklch(0.86 0.006 265);
+  --u-input: oklch(0.88 0.005 265);
+  --u-fg: oklch(0.23 0.012 265);
+  --u-fg-muted: oklch(0.44 0.012 265);
+  --u-fg-faint: oklch(0.52 0.01 265);
+  --u-accent: oklch(0.5 0.085 222);
+  --u-accent-text: oklch(0.46 0.085 222);
+  --u-accent-soft: oklch(0.95 0.022 222);
+  --u-primary: oklch(0.5 0.085 222);
+  --u-primary-hover: oklch(0.45 0.085 222);
+  --u-primary-fg: oklch(0.99 0 0);
+  --u-ring: oklch(0.6 0.09 222);
+  --u-success: oklch(0.58 0.13 158);
+  --u-success-text: oklch(0.47 0.12 158);
+  --u-success-soft: oklch(0.96 0.03 158);
+  --u-warning: oklch(0.72 0.14 70);
+  --u-warning-text: oklch(0.5 0.11 65);
+  --u-warning-soft: oklch(0.96 0.04 75);
+  --u-danger: oklch(0.56 0.19 27);
+  --u-danger-text: oklch(0.5 0.19 27);
+  --u-danger-soft: oklch(0.96 0.03 27);
+  --u-danger-fg: oklch(0.99 0 0);
+  --u-cat-1: #0083a7;
+  --u-cat-2: #e06c23;
+  --u-cat-3: #23b189;
+  --u-cat-4: #e5a323;
+  --u-cat-5: #d76797;
+  --u-cat-6: #36822f;
+  --u-cat-7: #6a57c1;
+  --u-cat-8: #d33b36;
+  --u-cat-other: #cbd2d9;
+  --u-chart-muted: oklch(0.84 0.03 222);
+  --u-chart-context: #a7afb8;
+  --u-chart-grid: #e6e8eb;
+  --u-chart-axis: #c8cace;
+  --u-ink-on-cat-1: #ffffff;
+  --u-ink-on-success: oklch(0.2 0 0);
+  --u-ink-on-warning: oklch(0.2 0 0);
+  --u-ink-on-other: oklch(0.2 0 0);
+  --u-seq-100: #dff4fd;
+  --u-seq-150: #c7e9f7;
+  --u-seq-200: #acdbee;
+  --u-seq-250: #8dcae1;
+  --u-seq-300: #6db8d4;
+  --u-seq-350: #4ba7c7;
+  --u-seq-400: #2495b8;
+  --u-seq-450: #0083a7;
+  --u-seq-500: #007193;
+  --u-seq-550: #00607e;
+  --u-seq-600: #00516a;
+  --u-seq-650: #004257;
+  --u-seq-700: #003445;
+  --u-section-treasures: #5b6770;
+  --u-section-ministry: #c18626;
+  --u-section-living: #942926;
+  --u-shadow-2xs: 0 1px 1px oklch(0.25 0.02 265 / 0.04);
+  --u-shadow-xs: 0 1px 2px oklch(0.25 0.02 265 / 0.05);
+  --u-shadow-sm: 0 1px 2px oklch(0.25 0.02 265 / 0.06), 0 1px 3px oklch(0.25 0.02 265 / 0.04);
+  --u-shadow-md: 0 4px 12px -4px oklch(0.25 0.02 265 / 0.14);
+  --u-shadow-lg: 0 12px 32px -10px oklch(0.25 0.02 265 / 0.22);
+  --u-shadow-xl: 0 20px 48px -12px oklch(0.25 0.02 265 / 0.28);
+  --u-shadow-2xl: 0 28px 64px -16px oklch(0.25 0.02 265 / 0.32);
+  --u-font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  --u-font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  --u-radius: 6px;
+  --u-radius-xs: 3px;
+  --u-radius-sm: 4px;
+  --u-radius-md: 5px;
+  --u-radius-lg: 6px;
+  --u-radius-xl: 6px;
+  --u-radius-2xl: 8px;
+  --u-radius-3xl: 10px;
+  --u-duration-fast: 120ms;
+  --u-duration-slow: 240ms;
+  --u-ease: cubic-bezier(0.2, 0, 0, 1);
+}
+
+.dark,
+[data-theme="dark"] {
+  color-scheme: dark;
+  --u-bg: #0d0e11;
+  --u-surface: #16171a;
+  --u-subtle: #111315;
+  --u-hover: #202226;
+  --u-selected: oklch(0.29 0.03 230);
+  --u-border: #282a2e;
+  --u-border-strong: oklch(0.37 0.01 265);
+  --u-input: oklch(0.34 0.01 265);
+  --u-fg: #eaebee;
+  --u-fg-muted: #aeb1b6;
+  --u-fg-faint: #8f9299;
+  --u-accent: #52acc9;
+  --u-accent-text: #74c1db;
+  --u-accent-soft: oklch(0.3 0.045 222);
+  --u-primary: #1e809c;
+  --u-primary-hover: oklch(0.51 0.095 222);
+  --u-primary-fg: #ffffff;
+  --u-ring: oklch(0.7 0.095 222);
+  --u-success: #42b079;
+  --u-success-text: #6bcb97;
+  --u-success-soft: oklch(0.3 0.05 158);
+  --u-warning: #ebae51;
+  --u-warning-text: #f1bd73;
+  --u-warning-soft: oklch(0.32 0.05 75);
+  --u-danger: #e86156;
+  --u-danger-text: #fa887d;
+  --u-danger-soft: oklch(0.3 0.06 27);
+  --u-danger-fg: oklch(0.17 0.01 265);
+  --u-cat-1: #0a80a3;
+  --u-cat-2: #d56326;
+  --u-cat-3: #3baa73;
+  --u-cat-4: #c38300;
+  --u-cat-5: #c65085;
+  --u-cat-6: #3c8836;
+  --u-cat-7: #8376d5;
+  --u-cat-8: #da534f;
+  --u-cat-other: oklch(0.45 0.01 250);
+  --u-chart-muted: oklch(0.45 0.035 222);
+  --u-chart-context: #656970;
+  --u-chart-grid: #24262a;
+  --u-chart-axis: #3a3d42;
+  --u-ink-on-cat-1: #ffffff;
+  --u-ink-on-success: oklch(0.17 0.01 265);
+  --u-ink-on-warning: oklch(0.17 0.01 265);
+  --u-ink-on-other: #ffffff;
+  --u-seq-100: #152a31;
+  --u-seq-150: #17353f;
+  --u-seq-200: #19404e;
+  --u-seq-250: #1c4f60;
+  --u-seq-300: #185e74;
+  --u-seq-350: #1b6d87;
+  --u-seq-400: #1d7d9a;
+  --u-seq-450: #298dac;
+  --u-seq-500: #3c9cbc;
+  --u-seq-550: #54abca;
+  --u-seq-600: #6ebad6;
+  --u-seq-650: #87c9e2;
+  --u-seq-700: #a4d7eb;
+  --u-section-treasures: #8d99a3;
+  --u-section-ministry: #d9a043;
+  --u-section-living: #cf5a55;
+  --u-shadow-2xs: 0 1px 1px oklch(0 0 0 / 0.3);
+  --u-shadow-xs: 0 1px 2px oklch(0 0 0 / 0.35);
+  --u-shadow-sm: 0 1px 2px oklch(0 0 0 / 0.4), 0 1px 3px oklch(0 0 0 / 0.3);
+  --u-shadow-md: 0 4px 12px -4px oklch(0 0 0 / 0.5);
+  --u-shadow-lg: 0 12px 32px -10px oklch(0 0 0 / 0.6);
+  --u-shadow-xl: 0 20px 48px -12px oklch(0 0 0 / 0.7);
+  --u-shadow-2xl: 0 28px 64px -16px oklch(0 0 0 / 0.75);
+}
+"
+`;
