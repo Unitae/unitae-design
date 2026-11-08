@@ -14,6 +14,7 @@ import {
   MetricStrip,
   Panel,
   SaveBar,
+  SectionHeading,
   SegmentedBar,
   SegmentedControl,
   SelectionBar,
@@ -306,6 +307,53 @@ describe('Panel', () => {
       </Panel>,
     )
     expect(screen.getByRole('region', { name: 'Informations' })).toBeTruthy()
+  })
+})
+
+function CollapsibleHost() {
+  const [expanded, setExpanded] = useState(true)
+  return (
+    <>
+      <SectionHeading
+        title="Territoires"
+        meta={2}
+        badge={<span>2 non lus</span>}
+        collapsible={{ expanded, onToggle: () => setExpanded((open) => !open), controls: 'docs' }}
+      />
+      <div id="docs" hidden={!expanded}>
+        Plan du territoire
+      </div>
+    </>
+  )
+}
+
+describe('SectionHeading', () => {
+  it('heads a section with its title, a quiet count and its actions', () => {
+    render(
+      <section aria-labelledby="h">
+        <SectionHeading id="h" title="À traiter" meta={4} actions={<a href="/x">Tout voir</a>} />
+      </section>,
+    )
+    expect(screen.getByRole('heading', { level: 2, name: /À traiter/ })).toBeTruthy()
+    expect(screen.getByRole('region', { name: /À traiter/ })).toBeTruthy()
+    expect(screen.getByText('4')).toBeTruthy()
+    expect(screen.getByRole('link', { name: 'Tout voir' })).toBeTruthy()
+  })
+
+  it('takes a lower level when the page needs one', () => {
+    render(<SectionHeading as="h3" title="Salle B" />)
+    expect(screen.getByRole('heading', { level: 3, name: 'Salle B' })).toBeTruthy()
+  })
+
+  it('shows and hides its content when collapsible, saying which way it is', () => {
+    render(<CollapsibleHost />)
+    const toggle = screen.getByRole('button', { name: /Territoires/ })
+    expect(toggle.getAttribute('aria-expanded')).toBe('true')
+    expect(toggle.getAttribute('aria-controls')).toBe('docs')
+    expect(within(toggle).getByText('2 non lus')).toBeTruthy()
+
+    fireEvent.click(toggle)
+    expect(toggle.getAttribute('aria-expanded')).toBe('false')
   })
 })
 

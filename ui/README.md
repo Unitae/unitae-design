@@ -41,6 +41,7 @@ Tell Tailwind v4 to read the classes the components use, next to the tokens impo
 | `FormSection`             | One part of a long form: title, kicker and actions left, fields right (`col-span-full`)     |
 | `SaveBar`                 | A form's save actions at the bottom, with the unsaved-changes dot and an announced label    |
 | `Panel`                   | A bordered block of a page: title and actions, rows edge to edge or `padded` fields, footer |
+| `SectionHeading`          | The line above a block: title, quiet count, tag, actions; `collapsible` shows and hides it  |
 | `SidePanel`               | Edits the selected item beside the main column; sticky, Escape closes, focus goes back      |
 | `Mark`, `Lockup`          | The Unitae mark, alone or with the wordmark                                                 |
 
