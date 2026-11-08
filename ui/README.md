@@ -37,7 +37,9 @@ Tell Tailwind v4 to read the classes the components use, next to the tokens impo
 | `Tag`, `Kbd`              | Quiet attribute labels, keyboard hints                                                      |
 | `Avatar`                  | A person's initials in a quiet disc, next to their name (`initials(name)` is exported too)  |
 | `SelectionBar`            | Floating actions on a list selection; announces the count, Escape clears                    |
-| `SegmentedControl`        | 2–5 exclusive choices with a sliding indicator and arrow-key navigation                     |
+| `SegmentedControl`        | 2–5 exclusive choices with a sliding indicator and arrow-key navigation; `null` = no choice |
+| `FormSection`             | One part of a long form: title, kicker and actions left, fields right (`col-span-full`)     |
+| `SaveBar`                 | A form's save actions at the bottom, with the unsaved-changes dot and an announced label    |
 | `Mark`, `Lockup`          | The Unitae mark, alone or with the wordmark                                                 |
 
 Helpers: `seriesColor(i)` (categorical colours in order, folded past eight), `chartMuted`, `chartContext`,
