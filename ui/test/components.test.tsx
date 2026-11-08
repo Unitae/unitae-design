@@ -12,10 +12,12 @@ import {
   LineChart,
   Mark,
   MetricStrip,
+  Panel,
   SaveBar,
   SegmentedBar,
   SegmentedControl,
   SelectionBar,
+  SidePanel,
   StatTile,
   Status,
   seriesColor,
@@ -281,5 +283,117 @@ describe('package boundaries', () => {
     for (const file of readdirSync(dir)) {
       expect(readFileSync(join(dir, file), 'utf8')).not.toMatch(/from ['"]react-router/)
     }
+  })
+})
+
+describe('Panel', () => {
+  it('names the panel after its title and keeps the actions and the footer with it', () => {
+    render(
+      <Panel title="Services" actions={<button type="button">Ajouter un service</button>} footer="4 services">
+        <div>Sonorisation</div>
+      </Panel>,
+    )
+    const panel = screen.getByRole('region', { name: 'Services' })
+    expect(within(panel).getByRole('button', { name: 'Ajouter un service' })).toBeTruthy()
+    expect(within(panel).getByText('Sonorisation')).toBeTruthy()
+    expect(within(panel).getByText('4 services')).toBeTruthy()
+  })
+
+  it('takes an accessible name when it has no title', () => {
+    render(
+      <Panel aria-label="Informations" padded>
+        <input aria-label="Nom" />
+      </Panel>,
+    )
+    expect(screen.getByRole('region', { name: 'Informations' })).toBeTruthy()
+  })
+})
+
+function PanelHost({ onClose = () => {} }: { onClose?: () => void }) {
+  const [open, setOpen] = useState(false)
+  return (
+    <>
+      <button type="button" onClick={() => setOpen(true)}>
+        Modifier
+      </button>
+      {open && (
+        <SidePanel
+          title="Partie de l’évènement"
+          description="Modification ponctuelle"
+          closeLabel="Fermer"
+          onClose={() => {
+            onClose()
+            setOpen(false)
+          }}
+          footer={<button type="submit">Enregistrer</button>}
+        >
+          <input aria-label="Nom" />
+        </SidePanel>
+      )}
+    </>
+  )
+}
+
+function ReturnFocusHost() {
+  const [open, setOpen] = useState(true)
+  const [row, setRow] = useState<HTMLButtonElement | null>(null)
+  return (
+    <>
+      <button type="button" ref={setRow}>
+        Modifier Discours
+      </button>
+      {open && (
+        <SidePanel title="Partie" closeLabel="Fermer" onClose={() => setOpen(false)} returnFocus={row}>
+          <input aria-label="Nom" />
+        </SidePanel>
+      )}
+    </>
+  )
+}
+
+describe('SidePanel', () => {
+  it('is a landmark named by its title and described by its line', () => {
+    render(<PanelHost />)
+    fireEvent.click(screen.getByRole('button', { name: 'Modifier' }))
+    const panel = screen.getByRole('complementary', { name: 'Partie de l’évènement' })
+    expect(panel.getAttribute('aria-describedby')).toBe(within(panel).getByText('Modification ponctuelle').id)
+    expect(within(panel).getByRole('button', { name: 'Enregistrer' })).toBeTruthy()
+  })
+
+  it('fits the screen under its top, so its footer stays in view', () => {
+    render(<PanelHost />)
+    fireEvent.click(screen.getByRole('button', { name: 'Modifier' }))
+    // jsdom lays nothing out: the panel sits at the top of the screen.
+    expect(screen.getByRole('complementary').style.getPropertyValue('--side-panel-top')).toBe('0px')
+  })
+
+  it('takes focus when it opens and gives it back when it closes', () => {
+    render(<PanelHost />)
+    const opener = screen.getByRole('button', { name: 'Modifier' })
+    opener.focus()
+    fireEvent.click(opener)
+    expect(document.activeElement).toBe(screen.getByRole('complementary'))
+    fireEvent.click(screen.getByRole('button', { name: 'Fermer' }))
+    expect(screen.queryByRole('complementary')).toBeNull()
+    expect(document.activeElement).toBe(opener)
+  })
+
+  it('gives focus back to the element it is told to, when there is one', () => {
+    render(<ReturnFocusHost />)
+    fireEvent.click(screen.getByRole('button', { name: 'Fermer' }))
+    expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Modifier Discours' }))
+  })
+
+  it('closes on Escape, but not when something inside handled the key first', () => {
+    let closed = 0
+    render(<PanelHost onClose={() => closed++} />)
+    fireEvent.click(screen.getByRole('button', { name: 'Modifier' }))
+    const field = screen.getByRole('textbox', { name: 'Nom' })
+    field.addEventListener('keydown', (event) => event.preventDefault(), { once: true })
+    fireEvent.keyDown(field, { key: 'Escape' })
+    expect(closed).toBe(0)
+    fireEvent.keyDown(field, { key: 'Escape' })
+    expect(closed).toBe(1)
+    expect(screen.queryByRole('complementary')).toBeNull()
   })
 })

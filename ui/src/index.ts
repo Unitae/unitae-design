@@ -27,9 +27,11 @@ export {
 } from './charts.tsx'
 export { FormSection, type FormSectionProps } from './form-section.tsx'
 export { Lockup, type LockupProps, Mark, type MarkProps } from './mark.tsx'
+export { Panel, type PanelProps } from './panel.tsx'
 export { SaveBar, type SaveBarProps } from './save-bar.tsx'
 export { SegmentedControl, type SegmentedControlProps, type SegmentedOption } from './segmented-control.tsx'
 export { SelectionBar, type SelectionBarProps } from './selection-bar.tsx'
+export { SidePanel, type SidePanelProps } from './side-panel.tsx'
 export {
   MetricStrip,
   type MetricStripProps,
