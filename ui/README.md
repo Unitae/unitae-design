@@ -1,7 +1,7 @@
 # @unitae/ui
 
 Unitae's React components, built on [`@unitae/tokens`](../tokens): stat tiles, a chart kit where every chart has a
-table twin, status marks, a segmented control and the brand mark.
+table twin, status marks, avatars, a selection bar, a segmented control and the brand mark.
 
 The library carries **no copy**: every label is a prop, so apps translate with their own i18n. It never imports a
 router (links are passed in), so it works in React Router 7 and 8 apps alike.
@@ -35,6 +35,8 @@ Tell Tailwind v4 to read the classes the components use, next to the tokens impo
 | `SegmentedBar`            | One whole split in ≤ 6 parts; values print inside where they fit                            |
 | `Status`, `StatusIcon`    | A state as shape + label (`success`, `warning`, `danger`, `neutral`)                        |
 | `Tag`, `Kbd`              | Quiet attribute labels, keyboard hints                                                      |
+| `Avatar`                  | A person's initials in a quiet disc, next to their name (`initials(name)` is exported too)  |
+| `SelectionBar`            | Floating actions on a list selection; announces the count, Escape clears                    |
 | `SegmentedControl`        | 2–5 exclusive choices with a sliding indicator and arrow-key navigation                     |
 | `Mark`, `Lockup`          | The Unitae mark, alone or with the wordmark                                                 |
 

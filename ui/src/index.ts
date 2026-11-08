@@ -1,3 +1,4 @@
+export { Avatar, type AvatarProps, initials } from './avatar.tsx'
 export {
   BarList,
   type BarListItem,
@@ -26,6 +27,7 @@ export {
 } from './charts.tsx'
 export { Lockup, type LockupProps, Mark, type MarkProps } from './mark.tsx'
 export { SegmentedControl, type SegmentedControlProps, type SegmentedOption } from './segmented-control.tsx'
+export { SelectionBar, type SelectionBarProps } from './selection-bar.tsx'
 export {
   MetricStrip,
   type MetricStripProps,
