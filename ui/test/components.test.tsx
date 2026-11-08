@@ -8,9 +8,11 @@ import {
   BarList,
   ChartCard,
   ColumnChart,
+  FormSection,
   LineChart,
   Mark,
   MetricStrip,
+  SaveBar,
   SegmentedBar,
   SegmentedControl,
   SelectionBar,
@@ -58,8 +60,8 @@ describe('MetricStrip', () => {
   })
 })
 
-function ControlledSegments() {
-  const [value, setValue] = useState<'week' | 'month' | 'year'>('month')
+function ControlledSegments({ initial = 'month' }: { initial?: 'week' | 'month' | 'year' | null }) {
+  const [value, setValue] = useState<'week' | 'month' | 'year' | null>(initial)
   return (
     <SegmentedControl
       aria-label="Période"
@@ -89,6 +91,54 @@ describe('SegmentedControl', () => {
     expect(screen.getByRole('button', { name: 'Année' }).getAttribute('aria-pressed')).toBe('true')
     fireEvent.keyDown(screen.getByRole('button', { name: 'Année' }), { key: 'ArrowRight' })
     expect(screen.getByRole('button', { name: 'Semaine' }).getAttribute('aria-pressed')).toBe('true')
+  })
+
+  it('can start with nothing chosen, still reachable by keyboard', () => {
+    render(<ControlledSegments initial={null} />)
+    const buttons = screen.getAllByRole('button')
+    expect(buttons.map((button) => button.getAttribute('aria-pressed'))).toEqual(['false', 'false', 'false'])
+    expect(buttons.map((button) => button.tabIndex)).toEqual([0, -1, -1])
+    fireEvent.click(screen.getByRole('button', { name: 'Mois' }))
+    expect(screen.getByRole('button', { name: 'Mois' }).getAttribute('aria-pressed')).toBe('true')
+  })
+})
+
+describe('FormSection', () => {
+  it('names the section after its title and keeps the kicker, description and actions beside the fields', () => {
+    render(
+      <FormSection
+        kicker="Porte à porte"
+        title="Entrée résidentielle"
+        description="Comment entrer et combien de foyers visiter."
+        actions={<button type="button">Supprimer cette entrée</button>}
+      >
+        <label>
+          Nombre de logements
+          <input />
+        </label>
+      </FormSection>,
+    )
+    const section = screen.getByRole('region', { name: 'Entrée résidentielle' })
+    expect(within(section).getByRole('heading', { level: 2 }).textContent).toBe('Entrée résidentielle')
+    expect(within(section).getByText('Porte à porte')).toBeTruthy()
+    expect(within(section).getByText('Comment entrer et combien de foyers visiter.')).toBeTruthy()
+    expect(within(section).getByRole('button', { name: 'Supprimer cette entrée' })).toBeTruthy()
+    expect(within(section).getByRole('textbox', { name: 'Nombre de logements' })).toBeTruthy()
+  })
+})
+
+describe('SaveBar', () => {
+  it('names itself, announces what is unsaved and holds the actions', () => {
+    render(
+      <SaveBar aria-label="Enregistrement" label="3 modifications non enregistrées">
+        <button type="button">Annuler</button>
+        <button type="submit">Mettre à jour</button>
+      </SaveBar>,
+    )
+    const bar = screen.getByRole('region', { name: 'Enregistrement' })
+    expect(within(bar).getByText('3 modifications non enregistrées').getAttribute('aria-live')).toBe('polite')
+    expect(within(bar).getByRole('button', { name: 'Annuler' })).toBeTruthy()
+    expect(within(bar).getByRole('button', { name: 'Mettre à jour' })).toBeTruthy()
   })
 })
 
