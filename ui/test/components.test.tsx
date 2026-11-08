@@ -4,6 +4,7 @@ import { fireEvent, render, screen, within } from '@testing-library/react'
 import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
 import {
+  Avatar,
   BarList,
   ChartCard,
   ColumnChart,
@@ -12,6 +13,7 @@ import {
   MetricStrip,
   SegmentedBar,
   SegmentedControl,
+  SelectionBar,
   StatTile,
   Status,
   seriesColor,
@@ -87,6 +89,37 @@ describe('SegmentedControl', () => {
     expect(screen.getByRole('button', { name: 'Année' }).getAttribute('aria-pressed')).toBe('true')
     fireEvent.keyDown(screen.getByRole('button', { name: 'Année' }), { key: 'ArrowRight' })
     expect(screen.getByRole('button', { name: 'Semaine' }).getAttribute('aria-pressed')).toBe('true')
+  })
+})
+
+describe('Avatar', () => {
+  it('shows the first letters of the first and last names, accents kept, and stays decorative', () => {
+    const { container, rerender } = render(<Avatar name="Élodie MARTIN" />)
+    expect(container.textContent).toBe('ÉM')
+    expect(container.firstElementChild?.getAttribute('aria-hidden')).toBe('true')
+    rerender(<Avatar name="  Marc  " />)
+    expect(container.textContent).toBe('M')
+  })
+})
+
+describe('SelectionBar', () => {
+  it('names the toolbar, announces the count and clears from its button or Escape', () => {
+    let cleared = 0
+    render(
+      <SelectionBar
+        aria-label="Actions sur la sélection"
+        label="2 sélectionnés"
+        clearLabel="Vider la sélection"
+        onClear={() => cleared++}
+      >
+        <button type="button">Changer de groupe</button>
+      </SelectionBar>,
+    )
+    const toolbar = screen.getByRole('toolbar', { name: 'Actions sur la sélection' })
+    expect(within(toolbar).getByText('2 sélectionnés').getAttribute('aria-live')).toBe('polite')
+    fireEvent.click(within(toolbar).getByRole('button', { name: 'Vider la sélection' }))
+    fireEvent.keyDown(within(toolbar).getByRole('button', { name: 'Changer de groupe' }), { key: 'Escape' })
+    expect(cleared).toBe(2)
   })
 })
 
