@@ -50,42 +50,48 @@ export function SegmentedControl<T extends string>({
   }
 
   return (
+    // The fieldset only names the group: the track inside it holds the grid and the indicator. A fieldset laid out
+    // as a grid gives an absolutely positioned child the wrong height in WebKit until something forces a relayout,
+    // so the indicator showed short on first render and came right after a click.
     <fieldset
       aria-label={rest['aria-label']}
-      className={cn(
-        'relative m-0 inline-grid min-w-0 rounded-md border-0 bg-hover p-0.5',
-        size === 'sm' ? 'h-7 text-xs' : 'h-[var(--u-control-height,2.125rem)] text-sm',
-        className,
-      )}
-      style={{ gridTemplateColumns: `repeat(${options.length}, minmax(0, 1fr))` }}
+      className={cn('m-0 inline-block min-w-0 border-0 p-0 align-middle', className)}
     >
-      <span
-        aria-hidden="true"
+      <div
         className={cn(
-          'absolute top-0.5 bottom-0.5 left-0.5 rounded-[calc(var(--u-radius-md)-1px)] bg-surface shadow-xs ring-1 ring-border transition-[transform,opacity] duration-(--u-duration-slow) ease-standard',
-          selected < 0 && 'opacity-0',
+          'relative grid w-full rounded-md bg-hover p-0.5',
+          size === 'sm' ? 'h-7 text-xs' : 'h-[var(--u-control-height,2.125rem)] text-sm',
         )}
-        style={{ width: `calc((100% - 4px) / ${options.length})`, transform: `translateX(${focusable * 100}%)` }}
-      />
-      {options.map((option, i) => (
-        <button
-          key={option.value}
-          ref={(el) => {
-            buttons.current[i] = el
-          }}
-          type="button"
-          aria-pressed={i === selected}
-          tabIndex={i === focusable ? 0 : -1}
-          onClick={() => onValueChange(option.value)}
-          onKeyDown={(event) => move(event, i)}
+        style={{ gridTemplateColumns: `repeat(${options.length}, minmax(0, 1fr))` }}
+      >
+        <span
+          aria-hidden="true"
           className={cn(
-            'relative z-10 rounded-md px-2.5 font-medium transition-colors focus-visible:outline-2 focus-visible:outline-ring',
-            i === selected ? 'text-foreground' : 'text-muted-foreground hover:text-foreground',
+            'absolute top-0.5 left-0.5 h-[calc(100%-4px)] rounded-[calc(var(--u-radius-md)-1px)] bg-surface shadow-xs ring-1 ring-border transition-[transform,opacity] duration-(--u-duration-slow) ease-standard',
+            selected < 0 && 'opacity-0',
           )}
-        >
-          {option.label}
-        </button>
-      ))}
+          style={{ width: `calc((100% - 4px) / ${options.length})`, transform: `translateX(${focusable * 100}%)` }}
+        />
+        {options.map((option, i) => (
+          <button
+            key={option.value}
+            ref={(el) => {
+              buttons.current[i] = el
+            }}
+            type="button"
+            aria-pressed={i === selected}
+            tabIndex={i === focusable ? 0 : -1}
+            onClick={() => onValueChange(option.value)}
+            onKeyDown={(event) => move(event, i)}
+            className={cn(
+              'relative z-10 rounded-md px-2.5 font-medium transition-colors focus-visible:outline-2 focus-visible:outline-ring',
+              i === selected ? 'text-foreground' : 'text-muted-foreground hover:text-foreground',
+            )}
+          >
+            {option.label}
+          </button>
+        ))}
+      </div>
     </fieldset>
   )
 }
