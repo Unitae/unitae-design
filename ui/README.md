@@ -41,6 +41,8 @@ Tell Tailwind v4 to read the classes the components use, next to the tokens impo
 | `Avatar`                  | A person's initials in a quiet disc, next to their name (`initials(name)` is exported too)  |
 | `SelectionBar`            | Floating actions on a list selection; announces the count, Escape clears                    |
 | `SegmentedControl`        | 2–5 exclusive choices with a sliding indicator and arrow-key navigation; `null` = no choice |
+| `FactList`                | Facts as label / value pairs in a `<dl>`; empty values left out, or `emptyLabel` for them   |
+| `DateChip`                | A day as a small tile, month over day, beside a row that says the full date                 |
 | `FormSection`             | One part of a long form: title, kicker and actions left, fields right (`col-span-full`)     |
 | `SaveBar`                 | A form's save actions at the bottom, with the unsaved-changes dot and an announced label    |
 | `Panel`                   | A bordered block of a page: title and actions, rows edge to edge or `padded` fields, footer |

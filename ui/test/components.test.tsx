@@ -8,6 +8,8 @@ import {
   BarList,
   ChartCard,
   ColumnChart,
+  DateChip,
+  FactList,
   FormSection,
   LineChart,
   Mark,
@@ -566,5 +568,55 @@ describe('stacked columns and dashed lines', () => {
     )
     expect(screen.getByRole('img', { name: 'Heures par mois' })).toBeTruthy()
     expect(screen.getByRole('img', { name: "Cumul de l'année" })).toBeTruthy()
+  })
+})
+
+describe('FactList', () => {
+  it('pairs each label with its value in a description list, the hint under the value', () => {
+    render(
+      <FactList
+        facts={[
+          { label: 'Téléphone', value: '06 12 34 56 78' },
+          { label: 'Naissance', value: '14 mai 1981', hint: '45 ans' },
+        ]}
+      />,
+    )
+    const terms = screen.getAllByRole('term').map((term) => term.textContent)
+    const definitions = screen.getAllByRole('definition').map((definition) => definition.textContent)
+    expect(terms).toEqual(['Téléphone', 'Naissance'])
+    expect(definitions).toEqual(['06 12 34 56 78', '14 mai 198145 ans'])
+    expect(screen.getByText('45 ans')).toBeTruthy()
+  })
+
+  it('leaves out a fact without a value', () => {
+    render(
+      <FactList
+        facts={[
+          { label: 'Téléphone', value: null },
+          { label: 'Adresse', value: '' },
+          { label: 'E-mail', value: 'p.fontaine@exemple.fr' },
+        ]}
+      />,
+    )
+    expect(screen.getAllByRole('term').map((term) => term.textContent)).toEqual(['E-mail'])
+  })
+
+  it('says a value is missing when it is given the words for it', () => {
+    render(<FactList emptyLabel="Non renseigné" facts={[{ label: 'Téléphone', value: undefined }]} />)
+    expect(screen.getByRole('definition').textContent).toBe('Non renseigné')
+  })
+
+  it('draws nothing when no fact is left', () => {
+    const { container } = render(<FactList facts={[{ label: 'Téléphone', value: null }]} />)
+    expect(container.querySelector('dl')).toBeNull()
+  })
+})
+
+describe('DateChip', () => {
+  it('stacks the month over the day and stays decorative, the row saying the full date', () => {
+    const { container } = render(<DateChip month="mars" day="19" />)
+    const chip = container.firstElementChild as HTMLElement
+    expect(chip.getAttribute('aria-hidden')).toBe('true')
+    expect(chip.textContent).toBe('mars19')
   })
 })
