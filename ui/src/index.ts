@@ -26,6 +26,8 @@ export {
   type LineChartProps,
   type LineSeries,
 } from './charts.tsx'
+export { DateChip, type DateChipProps } from './date-chip.tsx'
+export { type Fact, FactList, type FactListProps } from './fact-list.tsx'
 export { FormSection, type FormSectionProps } from './form-section.tsx'
 export { Lockup, type LockupProps, Mark, type MarkProps } from './mark.tsx'
 export { Panel, type PanelProps } from './panel.tsx'
