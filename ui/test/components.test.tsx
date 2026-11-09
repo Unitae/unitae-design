@@ -449,6 +449,23 @@ describe('SidePanel', () => {
   })
 })
 
+describe('StatTile meter', () => {
+  it('draws its meter between the value and the foot', () => {
+    render(
+      <StatTile
+        label="Rapports rendus"
+        value="52"
+        unit="sur 61"
+        meter={<ProgressBar value={52} max={61} aria-label="Rapports rendus" />}
+        foot="9 à relancer"
+      />,
+    )
+    const bar = screen.getByRole('progressbar', { name: 'Rapports rendus' })
+    const foot = screen.getByText('9 à relancer')
+    expect(bar.compareDocumentPosition(foot) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  })
+})
+
 describe('ProgressBar', () => {
   it('stays decorative without a name, so the text beside it is what gets read', () => {
     const { container } = render(<ProgressBar value={42} max={50} />)

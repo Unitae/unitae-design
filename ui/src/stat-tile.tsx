@@ -15,6 +15,8 @@ export interface StatTileProps {
   value: ReactNode
   /** Small unit after the value, e.g. "/ 52" or "territoires". */
   unit?: ReactNode
+  /** A mark between the value and the foot, e.g. a `ProgressBar` for « 52 sur 61 ». */
+  meter?: ReactNode
   /** One line under the value: a delta, a context, a comparison. */
   foot?: ReactNode
   /** Colour of the foot line: is this good news, a warning, or neutral context? */
@@ -25,7 +27,7 @@ export interface StatTileProps {
 }
 
 /** A headline number with its label, used alone or inside a `MetricStrip`. */
-export function StatTile({ label, value, unit, foot, tone = 'neutral', trend, className }: StatTileProps) {
+export function StatTile({ label, value, unit, meter, foot, tone = 'neutral', trend, className }: StatTileProps) {
   return (
     <div className={cn('flex min-w-0 flex-col gap-1 px-4 py-4', className)}>
       <span className="font-medium text-muted-foreground text-sm">{label}</span>
@@ -33,6 +35,7 @@ export function StatTile({ label, value, unit, foot, tone = 'neutral', trend, cl
         {value}
         {unit != null && <span className="ml-1.5 font-medium text-faint text-sm tracking-normal">{unit}</span>}
       </span>
+      {meter != null && <div className="my-1">{meter}</div>}
       {foot != null && <span className={cn('text-xs', toneClass[tone])}>{foot}</span>}
       {trend && trend.length > 1 && <Sparkline values={trend} className="mt-2" />}
     </div>
