@@ -21,6 +21,7 @@ export {
   ColumnChart,
   type ColumnChartProps,
   type ColumnDatum,
+  type ColumnGap,
   LineChart,
   type LineChartProps,
   type LineSeries,
@@ -28,6 +29,13 @@ export {
 export { FormSection, type FormSectionProps } from './form-section.tsx'
 export { Lockup, type LockupProps, Mark, type MarkProps } from './mark.tsx'
 export { Panel, type PanelProps } from './panel.tsx'
+export {
+  type PeriodLinkProps,
+  type PeriodStep,
+  PeriodStepper,
+  type PeriodStepperProps,
+} from './period-stepper.tsx'
+export { ProgressBar, type ProgressBarProps, type ProgressTone } from './progress-bar.tsx'
 export { SaveBar, type SaveBarProps } from './save-bar.tsx'
 export { SectionHeading, type SectionHeadingProps } from './section-heading.tsx'
 export { SegmentedControl, type SegmentedControlProps, type SegmentedOption } from './segmented-control.tsx'
@@ -36,7 +44,9 @@ export { SidePanel, type SidePanelProps } from './side-panel.tsx'
 export {
   MetricStrip,
   type MetricStripProps,
+  type SparkGap,
   Sparkline,
+  type SparklineProps,
   StatTile,
   type StatTileProps,
   type StatTone,
