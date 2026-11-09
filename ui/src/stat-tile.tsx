@@ -61,27 +61,63 @@ export function MetricStrip({ children, minTileWidth = 170, className, ...rest }
   )
 }
 
+/** A period without a value: one still to come, one outside the span, or one that should have had a value. */
+export type SparkGap = 'future' | 'off' | 'missing'
+
+const gapClass: Record<SparkGap, string> = {
+  future: 'bg-hover',
+  off: 'bg-transparent',
+  missing: 'bg-danger',
+}
+
 export interface SparklineProps {
-  values: number[]
+  /** One point per period, in order: a number draws a column, a gap marks a period without one. */
+  values: (number | SparkGap)[]
+  /** A reference level drawn as a dashed line, e.g. the monthly goal. Columns scale to it as well. */
+  goal?: number
+  /** Every column in the muted hue, e.g. for a stint that has ended. */
+  muted?: boolean
   className?: string
 }
 
-/** Tiny columns, decorative: the number it accompanies carries the meaning. */
-export function Sparkline({ values, className }: SparklineProps) {
-  const max = Math.max(...values, 0)
+/**
+ * Tiny columns, decorative: the number it accompanies carries the meaning. The last value is emphasised; a missing
+ * period gets a short red mark on the baseline, a future one a grey stub.
+ */
+export function Sparkline({ values, goal, muted = false, className }: SparklineProps) {
+  let max = Math.max(goal ?? 0, 0)
+  let last = -1
+  values.forEach((v, i) => {
+    if (typeof v !== 'number') return
+    max = Math.max(max, v)
+    last = i
+  })
+  const scale = (v: number) => (max > 0 ? (v / max) * 100 : 0)
+
   return (
-    <div aria-hidden="true" className={cn('flex h-6 items-end gap-0.5', className)}>
-      {values.map((v, i) => (
-        <span
+    <div aria-hidden="true" className={cn('relative flex h-6 items-end gap-0.5', className)}>
+      {values.map((v, i) =>
+        typeof v === 'number' ? (
+          <span
+            // biome-ignore lint/suspicious/noArrayIndexKey: positional series without identity
+            key={i}
+            className="flex-1 rounded-t-[2px]"
+            style={{
+              height: `${Math.max(scale(v), 4)}%`,
+              background: !muted && i === last ? 'var(--color-chart-1)' : 'var(--color-chart-muted)',
+            }}
+          />
+        ) : (
           // biome-ignore lint/suspicious/noArrayIndexKey: positional series without identity
-          key={i}
-          className="flex-1 rounded-[1px]"
-          style={{
-            height: `${max > 0 ? Math.max((v / max) * 100, 4) : 4}%`,
-            background: i === values.length - 1 ? 'var(--color-chart-1)' : 'var(--color-chart-muted)',
-          }}
+          <span key={i} className={cn('h-0.5 flex-1 rounded-[1px]', gapClass[v])} />
+        ),
+      )}
+      {goal != null && goal > 0 && (
+        <span
+          className="pointer-events-none absolute inset-x-0 border-faint border-t border-dashed opacity-70"
+          style={{ bottom: `${scale(goal)}%` }}
         />
-      ))}
+      )}
     </div>
   )
 }

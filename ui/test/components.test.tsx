@@ -13,12 +13,15 @@ import {
   Mark,
   MetricStrip,
   Panel,
+  PeriodStepper,
+  ProgressBar,
   SaveBar,
   SectionHeading,
   SegmentedBar,
   SegmentedControl,
   SelectionBar,
   SidePanel,
+  Sparkline,
   StatTile,
   Status,
   seriesColor,
@@ -443,5 +446,108 @@ describe('SidePanel', () => {
     fireEvent.keyDown(field, { key: 'Escape' })
     expect(closed).toBe(1)
     expect(screen.queryByRole('complementary')).toBeNull()
+  })
+})
+
+describe('ProgressBar', () => {
+  it('stays decorative without a name, so the text beside it is what gets read', () => {
+    const { container } = render(<ProgressBar value={42} max={50} />)
+    expect(screen.queryByRole('progressbar')).toBeNull()
+    expect(container.firstElementChild?.getAttribute('aria-hidden')).toBe('true')
+  })
+
+  it('announces its value once named, and stays full past the whole', () => {
+    const { container } = render(<ProgressBar value={60} max={50} aria-label="Objectif" />)
+    const bar = screen.getByRole('progressbar', { name: 'Objectif' })
+    expect(bar.getAttribute('aria-valuenow')).toBe('60')
+    expect(bar.getAttribute('aria-valuemax')).toBe('50')
+    expect((container.querySelector('[role=progressbar] > div') as HTMLElement).style.width).toBe('100%')
+  })
+})
+
+describe('PeriodStepper', () => {
+  it('steps with buttons, and holds a step that leads nowhere', () => {
+    let steps = 0
+    render(
+      <PeriodStepper
+        label="octobre 2026"
+        previous={{ label: 'Mois précédent', onClick: () => steps-- }}
+        next={{ label: 'Mois suivant', disabled: true, onClick: () => steps++ }}
+      />,
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Mois précédent' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Mois suivant' }))
+    expect(steps).toBe(-1)
+    expect(screen.getByText('octobre 2026')).toBeTruthy()
+  })
+
+  it("renders a step with an address through the app's link", () => {
+    render(
+      <PeriodStepper
+        label="2026–2027"
+        previous={{ label: 'Année précédente', href: '?sy=2025' }}
+        next={{ label: 'Année suivante', href: '?sy=2027' }}
+        renderLink={({ href, children, ...props }) => (
+          <a data-router="yes" href={`/pioneers${href}`} {...props}>
+            {children}
+          </a>
+        )}
+      />,
+    )
+    const previous = screen.getByRole('link', { name: 'Année précédente' })
+    expect(previous.getAttribute('href')).toBe('/pioneers?sy=2025')
+    expect(previous.dataset.router).toBe('yes')
+  })
+})
+
+describe('Sparkline', () => {
+  it('draws a column per value, a mark per gap and the goal as a line', () => {
+    const { container } = render(<Sparkline values={['off', 40, 'missing', 52, 'future']} goal={50} />)
+    const root = container.firstElementChild as HTMLElement
+    expect(root.getAttribute('aria-hidden')).toBe('true')
+    const marks = [...root.children] as HTMLElement[]
+    expect(marks).toHaveLength(6)
+    expect(marks.filter((m) => m.style.height !== '')).toHaveLength(2)
+    expect(marks[2]?.className).toContain('bg-danger')
+    // The last value takes the accent; the goal scales with the tallest of the values and itself.
+    expect(marks[3]?.style.background).toBe('var(--color-chart-1)')
+    expect(Number.parseFloat(marks[5]?.style.bottom ?? '')).toBeCloseTo((50 / 52) * 100, 2)
+  })
+})
+
+describe('stacked columns and dashed lines', () => {
+  it('render under their accessible name', () => {
+    render(
+      <>
+        <ColumnChart
+          aria-label="Heures par mois"
+          seriesLabels={{ value: 'Rapportées', stack: 'Crédit' }}
+          gapLabels={{ missing: 'Pas de rapport' }}
+          goal={{ value: 50, label: '50 h' }}
+          data={[
+            { key: '2026-09', label: 'S', value: 40 },
+            { key: '2026-10', label: 'O', value: 36, stack: 6 },
+            { key: '2026-11', label: 'N', value: 'missing' },
+            { key: '2026-12', label: 'D', value: 'future' },
+          ]}
+        />
+        <LineChart
+          aria-label="Cumul de l'année"
+          xKey="month"
+          data={[
+            { month: 'S', done: 40, goal: 50, projection: null },
+            { month: 'O', done: 82, goal: 100, projection: 82 },
+            { month: 'N', done: null, goal: 150, projection: 120 },
+          ]}
+          series={[
+            { key: 'goal', label: 'Objectif', context: true },
+            { key: 'done', label: 'Heures', area: true },
+            { key: 'projection', label: 'Projection', dashed: true },
+          ]}
+        />
+      </>,
+    )
+    expect(screen.getByRole('img', { name: 'Heures par mois' })).toBeTruthy()
+    expect(screen.getByRole('img', { name: "Cumul de l'année" })).toBeTruthy()
   })
 })
