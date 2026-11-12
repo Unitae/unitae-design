@@ -1,5 +1,5 @@
 /**
- * The Unitae map style: Protomaps vector tiles painted with the map tokens, labels in IBM Plex.
+ * The Unitae map style: Protomaps vector tiles painted with the map tokens, labels in IBM Plex letterforms.
  *
  * A quiet grey ground for our pins: no places, shops, transport, shields or one-way arrows, and no house numbers —
  * the pins already carry the numbers the lists show, and a second set of numbers would confuse. Nothing draws an
@@ -11,11 +11,15 @@ import { type Flavor, layers } from '@protomaps/basemaps'
 import { hexColors } from './index.ts'
 import type { Mode } from './tokens.ts'
 
-/** The glyph font stacks the style asks for. The host serves them under the `glyphs` address. */
+/**
+ * The glyph font stacks the style asks for; the host serves them under the `glyphs` address. They are IBM Plex Sans
+ * turned into map glyphs, under another name: the font's licence (OFL 1.1) reserves the name « Plex » for unmodified
+ * versions, and glyphs are a modified version. Ship the OFL and IBM's copyright with them.
+ */
 export const MAP_FONTS = {
-  regular: 'IBM Plex Sans Regular',
-  medium: 'IBM Plex Sans Medium',
-  italic: 'IBM Plex Sans Italic',
+  regular: 'Unitae Map Regular',
+  medium: 'Unitae Map Medium',
+  italic: 'Unitae Map Italic',
 } as const
 
 /** Who must be credited wherever the map shows: the tiles and the data under them. */
