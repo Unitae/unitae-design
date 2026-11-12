@@ -12,6 +12,13 @@ import {
   FactList,
   FormSection,
   LineChart,
+  MapAttribution,
+  MapCard,
+  MapCluster,
+  MapControls,
+  MapDot,
+  MapPin,
+  MapStatus,
   Mark,
   MetricStrip,
   Panel,
@@ -618,5 +625,124 @@ describe('DateChip', () => {
     const chip = container.firstElementChild as HTMLElement
     expect(chip.getAttribute('aria-hidden')).toBe('true')
     expect(chip.textContent).toBe('mars19')
+  })
+})
+
+describe('map pieces', () => {
+  it('a pin is a button named after its place, pressed once picked, reporting hover and focus', () => {
+    const seen: string[] = []
+    const { rerender } = render(
+      <MapPin
+        label="4 allée des Peupliers · 68 foyers"
+        onSelect={() => seen.push('select')}
+        onHover={(on) => seen.push(on ? 'in' : 'out')}
+      >
+        4
+      </MapPin>,
+    )
+    const pin = screen.getByRole('button', { name: '4 allée des Peupliers · 68 foyers' })
+    expect(pin.textContent).toBe('4')
+    expect(pin.getAttribute('aria-pressed')).toBe('false')
+    fireEvent.mouseEnter(pin)
+    fireEvent.click(pin)
+    fireEvent.mouseLeave(pin)
+    fireEvent.focus(pin)
+    expect(seen).toEqual(['in', 'select', 'out', 'in'])
+    rerender(
+      <MapPin label="4 allée des Peupliers · 68 foyers" state="selected">
+        4
+      </MapPin>,
+    )
+    expect(screen.getByRole('button').getAttribute('aria-pressed')).toBe('true')
+  })
+
+  it('an editor dot shows its state by shape, and stays out of the accessibility tree', () => {
+    const { container } = render(
+      <>
+        <MapDot state="in" />
+        <MapDot state="free" />
+        <MapDot state="remove" size="small" />
+      </>,
+    )
+    const dots = container.querySelectorAll('[data-state]')
+    expect([...dots].map((dot) => dot.getAttribute('data-state'))).toEqual(['in', 'free', 'remove'])
+    for (const dot of dots) expect(dot.getAttribute('aria-hidden')).toBe('true')
+    // A check for « in », nothing for « free », a cross for « remove »
+    expect([...dots].map((dot) => dot.querySelectorAll('path').length)).toEqual([1, 0, 1])
+  })
+
+  it('a cluster names how many places it holds, and zooms in when it can', () => {
+    let zoomed = 0
+    const { rerender } = render(<MapCluster count={24} label="24 entrées" />)
+    expect(screen.getByRole('img', { name: '24 entrées' }).textContent).toBe('24')
+    rerender(<MapCluster count={24} label="24 entrées" onSelect={() => zoomed++} />)
+    fireEvent.click(screen.getByRole('button', { name: '24 entrées' }))
+    expect(zoomed).toBe(1)
+  })
+
+  it('the controls zoom and recentre with the labels they are given', () => {
+    const calls: string[] = []
+    render(
+      <MapControls
+        labels={{ zoomIn: 'Zoomer', zoomOut: 'Dézoomer', recenter: 'Recentrer sur le territoire' }}
+        onZoomIn={() => calls.push('in')}
+        onZoomOut={() => calls.push('out')}
+        onRecenter={() => calls.push('recenter')}
+      />,
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Zoomer' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Dézoomer' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Recentrer sur le territoire' }))
+    expect(calls).toEqual(['in', 'out', 'recenter'])
+  })
+
+  it('the attribution links each source in a new tab', () => {
+    render(
+      <MapAttribution
+        sources={[
+          { label: 'Protomaps', href: 'https://protomaps.com' },
+          { label: '© OpenStreetMap', href: 'https://www.openstreetmap.org/copyright' },
+        ]}
+      />,
+    )
+    const osm = screen.getByRole('link', { name: '© OpenStreetMap' })
+    expect(osm.getAttribute('href')).toBe('https://www.openstreetmap.org/copyright')
+    expect(osm.getAttribute('target')).toBe('_blank')
+    expect(screen.getByRole('link', { name: 'Protomaps' })).toBeTruthy()
+  })
+
+  it('a card is named after its place and closes on its button or on Escape, unless the key was handled', () => {
+    let closed = 0
+    render(
+      <MapCard
+        title="4, 6, 8 allée des Peupliers"
+        meta="68 foyers"
+        closeLabel="Fermer la fiche"
+        onClose={() => closed++}
+      >
+        <input aria-label="Note" />
+      </MapCard>,
+    )
+    const card = screen.getByRole('region', { name: '4, 6, 8 allée des Peupliers' })
+    expect(within(card).getByText('68 foyers')).toBeTruthy()
+    fireEvent.click(within(card).getByRole('button', { name: 'Fermer la fiche' }))
+    expect(closed).toBe(1)
+    const field = within(card).getByRole('textbox', { name: 'Note' })
+    field.addEventListener('keydown', (event) => event.preventDefault(), { once: true })
+    fireEvent.keyDown(field, { key: 'Escape' })
+    expect(closed).toBe(1)
+    fireEvent.keyDown(window, { key: 'Escape' })
+    expect(closed).toBe(2)
+  })
+
+  it('the status announces itself and carries its action', () => {
+    render(
+      <MapStatus tone="error" action={<button type="button">Réessayer</button>}>
+        Le fond de carte ne répond pas.
+      </MapStatus>,
+    )
+    const status = screen.getByRole('status')
+    expect(status.textContent).toContain('Le fond de carte ne répond pas.')
+    expect(within(status).getByRole('button', { name: 'Réessayer' })).toBeTruthy()
   })
 })

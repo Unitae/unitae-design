@@ -48,10 +48,24 @@ Tell Tailwind v4 to read the classes the components use, next to the tokens impo
 | `Panel`                   | A bordered block of a page: title and actions, rows edge to edge or `padded` fields, footer |
 | `SectionHeading`          | The line above a block: title, quiet count, tag, actions; `collapsible` shows and hides it  |
 | `SidePanel`               | Edits the selected item beside the main column; sticky, Escape closes, focus goes back      |
+| `MapPin`                  | A place on a map, numbered like the list beside it; a button with hovered / selected states |
+| `MapDot`                  | An entrance's state in a map editor: on, free, elsewhere, to add, to remove                 |
+| `MapCluster`              | Places too close to tell apart: a quiet disc with their count, a button that zooms in       |
+| `MapControls`             | Zoom and « Recentrer » over the map; `MapControlGroup` / `MapControlButton` for more        |
+| `MapCaption`, `MapCard`   | A line about the map (top left); a picked place's card (corner, or full width below 1280)   |
+| `MapAttribution`          | The data credit, always visible bottom right (pass `MAP_ATTRIBUTION` from the tokens)       |
+| `MapStatus`               | Loading or failed tiles, in the middle of the map's frame                                   |
 | `Mark`, `Lockup`          | The Unitae mark, alone or with the wordmark                                                 |
 
 Helpers: `seriesColor(i)` (categorical colours in order, folded past eight), `chartMuted`, `chartContext`,
 `chartOther`, `cn`.
+
+## Maps
+
+The map pieces know nothing of the map engine: place them as MapLibre markers (or absolutely inside the map's
+frame) and wire their callbacks to the map. Build the map itself with `mapStyle` from `@unitae/tokens/map-style`: a
+quiet grey ground on which these pieces are the only coloured things. The pins and the controls grow to 44 px on a
+touch screen (`pointer: coarse`); the card leaves the attribution visible.
 
 ## Chart rules baked in
 

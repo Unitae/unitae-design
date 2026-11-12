@@ -71,6 +71,36 @@ CSS. They switch with dark mode automatically.
 - Status colours mean good / warning / bad; never use them as "series 4".
 - Labels inside a coloured fill use the matching `ink-on-*` colour; other text uses text colours, never the series colour.
 
+## Map
+
+The map is a quiet grey ground for the app's pins. Its colours are tokens like the others (`--u-map-ground`,
+`hexColors.dark['map-label']`…), and `@unitae/tokens/map-style` turns them into a MapLibre style for
+[Protomaps](https://protomaps.com) vector tiles:
+
+```sh
+pnpm add @protomaps/basemaps   # optional peer, needed only by map-style
+```
+
+```ts
+import { MAP_ATTRIBUTION, MAP_FONTS, mapStyle } from '@unitae/tokens/map-style'
+
+const style = mapStyle({
+  mode: 'light', // rebuild it when the theme changes: the map follows the app, not the device
+  tiles: '/tiles/2026-11/{z}/{x}/{y}.mvt', // your tile endpoint
+  glyphs: '/map-fonts/{fontstack}/{range}.pbf', // where you serve the MAP_FONTS glyphs
+  lang: 'fr',
+})
+```
+
+- Only the pins wear colour: no places, shops, transport, shields, one-way arrows or house numbers (the pins
+  already carry the numbers the lists show).
+- Labels use the `MAP_FONTS` glyph stacks (IBM Plex Sans Regular, Medium, Italic); names written in Devanagari ask
+  for `Noto Sans Devanagari Regular v1`, as Protomaps does.
+- Nothing draws an icon, so the style needs no sprite.
+- Credit `MAP_ATTRIBUTION` wherever the map shows: OpenStreetMap's licence wants it visible.
+- The tests check, in both modes, that labels reach 4.5:1 on their halo (the ground), that a pin — primary in a
+  ring of the surface — reaches 3:1, and that no map fill is more than a hint of colour.
+
 ## JS API
 
 ```ts

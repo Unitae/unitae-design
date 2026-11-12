@@ -78,6 +78,18 @@ export const colorNames = [
   'section-treasures',
   'section-ministry',
   'section-living',
+  // Map: a quiet grey ground for the pins. Only the pins wear colour; labels sit on a halo of the ground.
+  'map-ground',
+  'map-building',
+  'map-road',
+  'map-road-casing',
+  'map-landuse',
+  'map-park',
+  'map-water',
+  'map-rail',
+  'map-boundary',
+  'map-label',
+  'map-label-halo',
 ] as const
 
 export type ColorName = (typeof colorNames)[number]
@@ -153,6 +165,18 @@ const light: ColorScale = {
   'section-treasures': '#5b6770',
   'section-ministry': '#c18626',
   'section-living': '#942926',
+
+  'map-ground': '#eef1f4',
+  'map-building': '#d9dee4',
+  'map-road': '#ffffff',
+  'map-road-casing': '#d3d9df',
+  'map-landuse': '#e3e7eb',
+  'map-park': '#e1ebe4',
+  'map-water': '#d8e4ed',
+  'map-rail': '#c3c9d0',
+  'map-boundary': '#aab1ba',
+  'map-label': '#5f6872',
+  'map-label-halo': '#eef1f4',
 }
 
 const dark: ColorScale = {
@@ -224,6 +248,18 @@ const dark: ColorScale = {
   'section-treasures': '#8d99a3',
   'section-ministry': '#d9a043',
   'section-living': '#cf5a55',
+
+  'map-ground': '#1b1d21',
+  'map-building': '#2a2d33',
+  'map-road': '#2e3137',
+  'map-road-casing': '#15171a',
+  'map-landuse': '#222429',
+  'map-park': '#1b2520',
+  'map-water': '#17212a',
+  'map-rail': '#3a3e45',
+  'map-boundary': '#4d535b',
+  'map-label': '#9aa1aa',
+  'map-label-halo': '#1b1d21',
 }
 
 export const colors: Record<Mode, ColorScale> = { light, dark }
