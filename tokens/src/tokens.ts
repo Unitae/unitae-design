@@ -333,6 +333,18 @@ export const radii = {
   '3xl': '10px',
 } as const
 
+/**
+ * Type scale, at the round-1 density (14 px body), from the canvas tokens of direction D. Semantic names only:
+ * Tailwind's own `text-xs` … `text-xl` keep their sizes, so existing markup does not move. `h1` is the page title,
+ * `h2` a section or panel title, `metric` a headline number, `body` the running text.
+ */
+export const typeScale = {
+  body: { size: '0.875rem', lineHeight: '1.375rem' },
+  h2: { size: '0.9375rem', lineHeight: '1.375rem', weight: '600' },
+  h1: { size: '1.5rem', lineHeight: '2rem', weight: '600', letterSpacing: '-0.01em' },
+  metric: { size: '1.625rem', lineHeight: '2rem', weight: '600', letterSpacing: '-0.01em' },
+} as const
+
 /** Motion: fast and keyboard-like. Respect `prefers-reduced-motion` (see base.css). */
 export const motion = {
   fast: '120ms',

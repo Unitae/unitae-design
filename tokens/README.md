@@ -50,6 +50,10 @@ Also set by the theme:
 - **Radius** — one family: 6 px containers, 5 px controls. The Tailwind scale is deliberately remapped
   (`rounded-xl` → 6 px, `rounded-2xl` → 8 px) so existing markup adopts the new geometry; prefer
   `rounded-lg` / `rounded-md` in new code.
+- **Type** — semantic sizes beside Tailwind's own (`text-xs` … `text-xl` keep their sizes): `text-body` 14 px for
+  running text, `text-h1` 24 px for the page title, `text-h2` 15 px for a section or panel title, `text-metric` 26 px
+  for a headline number. Each sets its line height, and the titles their weight and tracking. `base.css` sets the body
+  to `text-body`; an app without it sets `body` itself.
 - **Motion** — every `transition` utility defaults to 120 ms with `cubic-bezier(0.2, 0, 0, 1)`;
   `ease-standard` is available, and `base.css` honours `prefers-reduced-motion`.
 - **Shadows** — light by design: separate with borders, keep elevation for floating surfaces.

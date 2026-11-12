@@ -1,4 +1,4 @@
-import { type ColorName, colorNames, colors, fonts, motion, radii, shadows } from './tokens.ts'
+import { type ColorName, colorNames, colors, fonts, motion, radii, shadows, typeScale } from './tokens.ts'
 
 /**
  * Tailwind / shadcn colour names → Unitae tokens. These are the exact names the apps' components
@@ -99,6 +99,28 @@ function declarations(entries: [string, string][], indent = '  '): string {
 }
 
 /** Raw tokens as `--u-*` custom properties: light on `:root`, dark on `.dark` / `[data-theme="dark"]`. */
+/** The type scale as raw tokens: `--u-text-h1`, `--u-text-h1-line-height`, `--u-text-h1-weight`… */
+function typeTokens(): [string, string][] {
+  return Object.entries(typeScale).flatMap(([name, step]): [string, string][] => [
+    [`--u-text-${name}`, step.size],
+    [`--u-text-${name}-line-height`, step.lineHeight],
+    ...('weight' in step ? [[`--u-text-${name}-weight`, step.weight] as [string, string]] : []),
+    ...('letterSpacing' in step ? [[`--u-text-${name}-letter-spacing`, step.letterSpacing] as [string, string]] : []),
+  ])
+}
+
+/** The type scale as Tailwind text utilities: `text-h1` sets the size with its line height, weight and tracking. */
+function typeTheme(): [string, string][] {
+  return Object.entries(typeScale).flatMap(([name, step]): [string, string][] => [
+    [`--text-${name}`, `var(--u-text-${name})`],
+    [`--text-${name}--line-height`, `var(--u-text-${name}-line-height)`],
+    ...('weight' in step ? [[`--text-${name}--font-weight`, `var(--u-text-${name}-weight)`] as [string, string]] : []),
+    ...('letterSpacing' in step
+      ? [[`--text-${name}--letter-spacing`, `var(--u-text-${name}-letter-spacing)`] as [string, string]]
+      : []),
+  ])
+}
+
 export function tokensCss(version: string): string {
   const lightColors = colorNames.map((n): [string, string] => [`--u-${n}`, colors.light[n]])
   const darkColors = colorNames.map((n): [string, string] => [`--u-${n}`, colors.dark[n]])
@@ -111,6 +133,7 @@ export function tokensCss(version: string): string {
     ['--u-duration-fast', motion.fast],
     ['--u-duration-slow', motion.slow],
     ['--u-ease', motion.ease],
+    ...typeTokens(),
   ]
   return `${header(version, 'raw tokens')}
 :root {
@@ -150,6 +173,7 @@ ${declarations([
   ['--font-mono', 'var(--u-font-mono)'],
   ...radiusEntries,
   ...shadowEntries,
+  ...typeTheme(),
   ['--ease-standard', 'var(--u-ease)'],
   ['--default-transition-duration', 'var(--u-duration-fast)'],
   ['--default-transition-timing-function', 'var(--u-ease)'],
@@ -179,6 +203,8 @@ export function baseCss(version: string): string {
     background-color: var(--u-bg);
     color: var(--u-fg);
     font-family: var(--u-font-sans);
+    font-size: var(--u-text-body);
+    line-height: var(--u-text-body-line-height);
   }
 }
 

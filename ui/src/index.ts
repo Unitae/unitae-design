@@ -7,6 +7,7 @@ export {
   type SegmentedBarPart,
   type SegmentedBarProps,
 } from './bars.tsx'
+export { Callout, type CalloutProps, type CalloutTone } from './callout.tsx'
 export {
   ChartCard,
   type ChartCardProps,
@@ -27,6 +28,7 @@ export {
   type LineSeries,
 } from './charts.tsx'
 export { DateChip, type DateChipProps } from './date-chip.tsx'
+export { DateField, type DateFieldLabels, type DateFieldProps } from './date-field.tsx'
 export { type Fact, FactList, type FactListProps } from './fact-list.tsx'
 export { FormSection, type FormSectionProps } from './form-section.tsx'
 export {
@@ -60,11 +62,12 @@ export {
   type PeriodStepperProps,
 } from './period-stepper.tsx'
 export { ProgressBar, type ProgressBarProps, type ProgressTone } from './progress-bar.tsx'
+export { ProgressRing, type ProgressRingProps } from './progress-ring.tsx'
 export { SaveBar, type SaveBarProps } from './save-bar.tsx'
 export { SectionHeading, type SectionHeadingProps } from './section-heading.tsx'
 export { SegmentedControl, type SegmentedControlProps, type SegmentedOption } from './segmented-control.tsx'
 export { SelectionBar, type SelectionBarProps } from './selection-bar.tsx'
-export { SidePanel, type SidePanelProps } from './side-panel.tsx'
+export { SidePanel, type SidePanelProps, type SidePanelWalk } from './side-panel.tsx'
 export {
   MetricStrip,
   type MetricStripProps,

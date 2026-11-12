@@ -61,7 +61,8 @@ export type MapDotState = 'in' | 'free' | 'other' | 'add' | 'remove'
 const DOT_LOOK: Record<MapDotState, string> = {
   in: 'size-4.5 bg-primary text-primary-foreground ring-2 ring-surface shadow-sm',
   // Free reads as « nothing yet »: the neutral dashed circle of the lists, never green.
-  free: 'size-4.5 border-[1.5px] border-dashed border-faint bg-surface shadow-sm',
+  // On the dark ground the surface would vanish: a slightly lighter fill and a stronger ring keep the dot in view.
+  free: 'size-4.5 border-[1.5px] border-dashed border-faint bg-surface shadow-sm dark:border-muted-foreground dark:bg-hover',
   other: 'size-2.5 bg-faint/70 ring-2 ring-surface',
   add: 'size-4.5 bg-primary text-primary-foreground ring-2 ring-surface outline-[1.5px] outline-primary outline-offset-[3px] shadow-sm',
   remove: 'size-4.5 border-2 border-danger bg-surface text-danger shadow-sm',
@@ -132,7 +133,11 @@ export function MapCluster({ count, label, onSelect, className }: MapClusterProp
       type="button"
       aria-label={label}
       onClick={onSelect}
-      className={cn(look, 'cursor-pointer focus-visible:outline-2 focus-visible:outline-ring')}
+      className={cn(
+        look,
+        // A touch target of 44 px at least, whatever the disc's size: the first thing tapped on a zoomed-out map.
+        'relative cursor-pointer focus-visible:outline-2 focus-visible:outline-ring pointer-coarse:before:absolute pointer-coarse:before:-inset-2.5',
+      )}
     >
       {count}
     </button>

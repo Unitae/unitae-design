@@ -12,8 +12,21 @@ export interface SidePanelProps {
   footer?: ReactNode
   /** Where focus goes back on close, e.g. the row's edit button. Defaults to what had focus when the panel opened. */
   returnFocus?: HTMLElement | null
+  /**
+   * Walks the list the panel was opened from: where this item sits (« 3 sur 12 ») and buttons to the previous and
+   * next ones, in the header beside the close button. Leave a handler out where there is nowhere to go.
+   */
+  walk?: SidePanelWalk
   children: ReactNode
   className?: string
+}
+
+export interface SidePanelWalk {
+  position: ReactNode
+  previousLabel: string
+  nextLabel: string
+  onPrevious?: () => void
+  onNext?: () => void
 }
 
 /**
@@ -35,6 +48,7 @@ export function SidePanel({
   closeLabel,
   footer,
   returnFocus,
+  walk,
   children,
   className,
 }: SidePanelProps) {
@@ -118,6 +132,17 @@ export function SidePanel({
             </p>
           )}
         </div>
+        {walk != null && (
+          <div className="-mt-0.5 flex flex-none items-center gap-0.5">
+            <span className="mr-1 text-faint text-xs tabular-nums">{walk.position}</span>
+            <HeaderButton label={walk.previousLabel} onClick={walk.onPrevious}>
+              <path d="M4 10l4-4 4 4" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" />
+            </HeaderButton>
+            <HeaderButton label={walk.nextLabel} onClick={walk.onNext}>
+              <path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" />
+            </HeaderButton>
+          </div>
+        )}
         <button
           type="button"
           onClick={onClose}
@@ -136,5 +161,21 @@ export function SidePanel({
         </div>
       )}
     </aside>
+  )
+}
+
+function HeaderButton({ label, onClick, children }: { label: string; onClick?: () => void; children: ReactNode }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={onClick == null}
+      aria-label={label}
+      className="inline-flex size-7 items-center justify-center rounded-md text-muted-foreground outline-none transition-colors duration-(--u-duration-fast) hover:bg-hover hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-40"
+    >
+      <svg viewBox="0 0 16 16" width={16} height={16} aria-hidden="true">
+        {children}
+      </svg>
+    </button>
   )
 }

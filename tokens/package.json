@@ -1,6 +1,6 @@
 {
   "name": "@unitae/tokens",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Design tokens for Unitae: colours, type, radius, motion, chart palettes and the map style, as CSS variables, a Tailwind v4 theme and a JS API.",
   "license": "MIT",
   "type": "module",

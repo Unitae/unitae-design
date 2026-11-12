@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { chroma, contrast, lightness } from '../src/color.ts'
 import { baseCss, fontsCss, themeColors, themeCss, tokensCss } from '../src/css.ts'
 import { hexColors } from '../src/index.ts'
-import { type ColorName, colorNames, colors, type Mode, ordinal } from '../src/tokens.ts'
+import { type ColorName, colorNames, colors, type Mode, ordinal, typeScale } from '../src/tokens.ts'
 
 const modes: Mode[] = ['light', 'dark']
 const HEX = /^#[0-9a-f]{6}$/
@@ -114,6 +114,12 @@ describe('map', () => {
       expect(ratio(mode, 'primary', 'map-ground')).toBeGreaterThanOrEqual(3)
     })
 
+    it(`${mode}: a free entrance's dashed ring stands out from the ground (3:1)`, () => {
+      // MapDot « free »: a dashed ring in the faint grey (light) or the muted grey (dark), over the map's ground.
+      const ring = mode === 'light' ? colors.light['fg-faint'] : colors.dark['fg-muted']
+      expect(contrast(ring, colors[mode]['map-ground'])).toBeGreaterThanOrEqual(3)
+    })
+
     it(`${mode}: the map stays grey — no fill is more colourful than a hint`, () => {
       for (const fill of ['map-ground', ...fills] as ColorName[]) {
         expect(chroma(colors[mode][fill])).toBeLessThan(0.03)
@@ -216,6 +222,41 @@ describe('Tailwind theme', () => {
 
   it('aliases the display font to the UI sans so legacy font-display markup follows the rebrand', () => {
     expect(themeCss('0.0.0')).toContain('--font-display: var(--u-font-sans);')
+  })
+})
+
+describe('type scale', () => {
+  // Round 1 set the density at a 14 px body; the canvas tokens of direction D draw a 24 px page title, 15 px section
+  // titles and 26 px headline numbers. The apps' own text-xs / sm / base keep their Tailwind sizes.
+  const px = (rem: string) => Number.parseFloat(rem) * 16
+
+  it('sets the body at 14 px, the page title at 24, section titles at 15 and headline numbers at 26', () => {
+    expect(px(typeScale.body.size)).toBe(14)
+    expect(px(typeScale.h1.size)).toBe(24)
+    expect(px(typeScale.h2.size)).toBe(15)
+    expect(px(typeScale.metric.size)).toBe(26)
+  })
+
+  it('gives every step a line height at least as tall as its size', () => {
+    for (const step of Object.values(typeScale)) expect(px(step.lineHeight)).toBeGreaterThanOrEqual(px(step.size))
+  })
+
+  it('maps each step onto a Tailwind text utility with its line height, and its weight where it has one', () => {
+    const theme = themeCss('0.0.0')
+    for (const [name, step] of Object.entries(typeScale)) {
+      expect(theme).toContain(`--text-${name}: var(--u-text-${name});`)
+      expect(theme).toContain(`--text-${name}--line-height: var(--u-text-${name}-line-height);`)
+      if ('weight' in step) expect(theme).toContain(`--text-${name}--font-weight: var(--u-text-${name}-weight);`)
+    }
+  })
+
+  it('leaves Tailwind’s own text sizes alone, so existing markup keeps its size', () => {
+    const theme = themeCss('0.0.0')
+    for (const name of ['xs', 'sm', 'base', 'lg', 'xl']) expect(theme).not.toContain(`--text-${name}:`)
+  })
+
+  it('sets the body size in the optional element defaults', () => {
+    expect(baseCss('0.0.0')).toContain('font-size: var(--u-text-body);')
   })
 })
 
