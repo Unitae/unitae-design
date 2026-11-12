@@ -1,6 +1,6 @@
 {
   "name": "@unitae/ui",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "description": "Unitae UI components: stat tiles, chart kit (with table twins), status, avatars, selection bar, segmented control, form sections, save bar, panels, section headings, map pieces and the brand mark. Built on @unitae/tokens.",
   "license": "MIT",
   "type": "module",
@@ -37,7 +37,7 @@
     "prepublishOnly": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\" && tsc6 -p tsconfig.build.json && vitest run"
   },
   "peerDependencies": {
-    "@unitae/tokens": "^0.1.0 || ^0.2.0",
+    "@unitae/tokens": "^0.1.0 || ^0.2.0 || ^0.3.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "recharts": "^3.0.0"

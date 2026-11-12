@@ -3,7 +3,7 @@ import { type ColorName, type ColorScale, colorNames, colors, type Mode } from '
 
 export { chroma, contrast, lightness, toHex } from './color.ts'
 export type { ColorName, ColorScale, Mode } from './tokens.ts'
-export { categorical, colorNames, colors, fonts, motion, ordinal, radii, shadows } from './tokens.ts'
+export { categorical, colorNames, colors, fonts, motion, ordinal, radii, shadows, typeScale } from './tokens.ts'
 
 function toHexScale(scale: ColorScale): ColorScale {
   const out = {} as ColorScale

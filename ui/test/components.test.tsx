@@ -6,9 +6,11 @@ import { describe, expect, it } from 'vitest'
 import {
   Avatar,
   BarList,
+  Callout,
   ChartCard,
   ColumnChart,
   DateChip,
+  DateField,
   FactList,
   FormSection,
   LineChart,
@@ -24,6 +26,7 @@ import {
   Panel,
   PeriodStepper,
   ProgressBar,
+  ProgressRing,
   SaveBar,
   SectionHeading,
   SegmentedBar,
@@ -744,5 +747,191 @@ describe('map pieces', () => {
     const status = screen.getByRole('status')
     expect(status.textContent).toContain('Le fond de carte ne répond pas.')
     expect(within(status).getByRole('button', { name: 'Réessayer' })).toBeTruthy()
+  })
+})
+
+describe('ProgressRing', () => {
+  it('is decorative without a name, and a progress bar with one', () => {
+    const { container, rerender } = render(<ProgressRing value={5} max={7} />)
+    expect(container.querySelector('svg')?.getAttribute('aria-hidden')).toBe('true')
+    rerender(<ProgressRing value={5} max={7} aria-label="Parties attribuées" />)
+    const ring = screen.getByRole('progressbar', { name: 'Parties attribuées' })
+    expect(ring.getAttribute('aria-valuenow')).toBe('5')
+    expect(ring.getAttribute('aria-valuemax')).toBe('7')
+  })
+
+  it('draws an arc in proportion to the share, over a solid track', () => {
+    const { container } = render(<ProgressRing value={1} max={4} />)
+    const [track, arc] = container.querySelectorAll('circle')
+    expect(track.getAttribute('stroke-dasharray')).toBeNull()
+    const [drawn, rest] = (arc.getAttribute('stroke-dasharray') ?? '').split(' ').map(Number)
+    expect(drawn / (drawn + rest)).toBeCloseTo(0.25, 2)
+  })
+
+  it('draws no arc at zero, a full one in the success tone once complete, and stays full past it', () => {
+    const { container, rerender } = render(<ProgressRing value={0} max={3} />)
+    expect(container.querySelectorAll('circle')).toHaveLength(1)
+    rerender(<ProgressRing value={4} max={3} />)
+    const arc = container.querySelectorAll('circle')[1]
+    expect(arc.getAttribute('style')).toContain('--u-success')
+    const [drawn, rest] = (arc.getAttribute('stroke-dasharray') ?? '').split(' ').map(Number)
+    expect(rest).toBeCloseTo(0, 5)
+    expect(drawn).toBeGreaterThan(0)
+  })
+})
+
+describe('Callout', () => {
+  it('shows the tone as a shape, then the title, the body and the action', () => {
+    render(
+      <Callout tone="danger" title="Impossible d’enregistrer" action={<button type="button">Réessayer</button>}>
+        Ce numéro est déjà pris.
+      </Callout>,
+    )
+    const callout = screen.getByText('Impossible d’enregistrer').closest('[data-callout]')
+    expect(callout?.getAttribute('data-tone')).toBe('danger')
+    expect(callout?.querySelector('svg[aria-hidden="true"]')).not.toBeNull()
+    expect(screen.getByText('Ce numéro est déjà pris.')).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Réessayer' })).toBeTruthy()
+  })
+
+  it('announces itself only when asked to', () => {
+    const { rerender } = render(<Callout tone="warning">Hors ligne</Callout>)
+    expect(screen.queryByRole('alert')).toBeNull()
+    rerender(
+      <Callout tone="danger" role="alert">
+        Échec
+      </Callout>,
+    )
+    expect(screen.getByRole('alert').textContent).toContain('Échec')
+  })
+})
+
+const DATE_LABELS = { openCalendar: 'Choisir une date', previousMonth: 'Mois précédent', nextMonth: 'Mois suivant' }
+
+function ControlledDateField({ initial = '2026-11-10', min }: { initial?: string | null; min?: string }) {
+  const [value, setValue] = useState<string | null>(initial)
+  return (
+    <>
+      <label htmlFor="from">Du</label>
+      <DateField
+        id="from"
+        name="from"
+        locale="fr-FR"
+        labels={DATE_LABELS}
+        value={value}
+        onChange={setValue}
+        min={min}
+      />
+      <output data-testid="value">{value ?? ''}</output>
+    </>
+  )
+}
+
+describe('DateField', () => {
+  it('writes the date out with its weekday, and submits it as YYYY-MM-DD', () => {
+    const { container } = render(<ControlledDateField />)
+    const field = screen.getByLabelText('Du') as HTMLInputElement
+    expect(field.value).toBe('mar. 10 novembre 2026')
+    expect((container.querySelector('input[type="hidden"][name="from"]') as HTMLInputElement).value).toBe('2026-11-10')
+  })
+
+  it('takes a typed date in the reader’s order, and shows it numerically while typing', () => {
+    render(<ControlledDateField />)
+    const field = screen.getByLabelText('Du') as HTMLInputElement
+    fireEvent.focus(field)
+    expect(field.value).toBe('10/11/2026')
+    fireEvent.change(field, { target: { value: '3/12/26' } })
+    fireEvent.blur(field)
+    expect(screen.getByTestId('value').textContent).toBe('2026-12-03')
+    expect(field.value).toBe('jeu. 3 décembre 2026')
+  })
+
+  it('keeps the date when what was typed is not one', () => {
+    render(<ControlledDateField />)
+    const field = screen.getByLabelText('Du') as HTMLInputElement
+    fireEvent.focus(field)
+    fireEvent.change(field, { target: { value: '31/02/2026' } })
+    fireEvent.blur(field)
+    expect(screen.getByTestId('value').textContent).toBe('2026-11-10')
+  })
+
+  it('opens a month calendar on the date, and a day picked there becomes the value', () => {
+    render(<ControlledDateField />)
+    fireEvent.click(screen.getByRole('button', { name: 'Choisir une date' }))
+    const grid = screen.getByRole('grid', { name: 'novembre 2026' })
+    expect(within(grid).getByRole('button', { name: /10 novembre 2026/, pressed: true })).toBeTruthy()
+    fireEvent.click(within(grid).getByRole('button', { name: /^vendredi 13 novembre 2026/ }))
+    expect(screen.getByTestId('value').textContent).toBe('2026-11-13')
+    expect(screen.queryByRole('grid')).toBeNull()
+  })
+
+  it('walks the calendar by keyboard and closes on Escape', () => {
+    render(<ControlledDateField />)
+    fireEvent.click(screen.getByRole('button', { name: 'Choisir une date' }))
+    const grid = screen.getByRole('grid')
+    fireEvent.keyDown(grid, { key: 'ArrowRight' })
+    fireEvent.keyDown(grid, { key: 'ArrowDown' })
+    expect((document.activeElement as HTMLElement).getAttribute('aria-label')).toMatch(/18 novembre 2026/)
+    fireEvent.keyDown(grid, { key: 'PageDown' })
+    expect(screen.getByRole('grid', { name: 'décembre 2026' })).toBeTruthy()
+    fireEvent.keyDown(grid, { key: 'Escape' })
+    expect(screen.queryByRole('grid')).toBeNull()
+    expect(screen.getByTestId('value').textContent).toBe('2026-11-10')
+  })
+
+  it('leaves days before `min` out of reach', () => {
+    render(<ControlledDateField min="2026-11-05" />)
+    fireEvent.click(screen.getByRole('button', { name: 'Choisir une date' }))
+    expect((screen.getByRole('button', { name: /^mercredi 4 novembre 2026/ }) as HTMLButtonElement).disabled).toBe(true)
+  })
+
+  it('moves between months with its arrows', () => {
+    render(<ControlledDateField />)
+    fireEvent.click(screen.getByRole('button', { name: 'Choisir une date' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Mois suivant' }))
+    expect(screen.getByRole('grid', { name: 'décembre 2026' })).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: 'Mois précédent' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Mois précédent' }))
+    expect(screen.getByRole('grid', { name: 'octobre 2026' })).toBeTruthy()
+  })
+})
+
+describe('SidePanel walk', () => {
+  it('shows where the item sits and steps to the previous and next ones', () => {
+    const calls: string[] = []
+    render(
+      <SidePanel
+        title="T03"
+        onClose={() => {}}
+        closeLabel="Fermer"
+        walk={{
+          position: '3 sur 12',
+          previousLabel: 'Précédent',
+          nextLabel: 'Suivant',
+          onPrevious: () => calls.push('previous'),
+          onNext: () => calls.push('next'),
+        }}
+      >
+        <p>Contenu</p>
+      </SidePanel>,
+    )
+    expect(screen.getByText('3 sur 12')).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: 'Précédent' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Suivant' }))
+    expect(calls).toEqual(['previous', 'next'])
+  })
+
+  it('disables a step that has nowhere to go', () => {
+    render(
+      <SidePanel
+        title="T01"
+        onClose={() => {}}
+        closeLabel="Fermer"
+        walk={{ position: '1 sur 12', previousLabel: 'Précédent', nextLabel: 'Suivant', onNext: () => {} }}
+      >
+        <p>Contenu</p>
+      </SidePanel>,
+    )
+    expect((screen.getByRole('button', { name: 'Précédent' }) as HTMLButtonElement).disabled).toBe(true)
   })
 })
