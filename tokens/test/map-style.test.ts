@@ -5,6 +5,8 @@ import type { Mode } from '../src/tokens.ts'
 
 const modes: Mode[] = ['light', 'dark']
 const HEX = /#[0-9a-f]{6}\b/gi
+// A font stack named in a layer: « Unitae Map Regular », « Noto Sans Devanagari Regular v1 »…
+const FONT_NAME = /"[^"]* (?:Regular|Medium|Italic|Bold)(?: v\d+)?"/g
 
 const style = (mode: Mode, lang = 'fr') =>
   mapStyle({ mode, lang, tiles: '/tiles/2026-11/{z}/{x}/{y}.mvt', glyphs: '/map-fonts/{fontstack}/{range}.pbf' })
@@ -73,7 +75,7 @@ describe('mapStyle', () => {
     expect(ids).toContain('buildings')
   })
 
-  it('sets every label in IBM Plex (Devanagari names keep the Noto face Protomaps asks for)', () => {
+  it('sets every label in the map fonts (Devanagari names keep the Noto face Protomaps asks for)', () => {
     const allowed = new Set([...Object.values(MAP_FONTS), 'Noto Sans Devanagari Regular v1'])
     const fonts = style('light')
       .layers.filter((layer) => layer.type === 'symbol')
@@ -83,7 +85,7 @@ describe('mapStyle', () => {
           ('text-font' in layout && layout['text-font']) || [],
           'text-field' in layout ? layout['text-field'] : [],
         ])
-        return text.match(/"[^"]*Sans[^"]*"/g) ?? []
+        return text.match(FONT_NAME) ?? []
       })
       .map((quoted) => JSON.parse(quoted) as string)
     expect(fonts).toContain(MAP_FONTS.regular)

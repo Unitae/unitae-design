@@ -94,8 +94,10 @@ const style = mapStyle({
 
 - Only the pins wear colour: no places, shops, transport, shields, one-way arrows or house numbers (the pins
   already carry the numbers the lists show).
-- Labels use the `MAP_FONTS` glyph stacks (IBM Plex Sans Regular, Medium, Italic); names written in Devanagari ask
-  for `Noto Sans Devanagari Regular v1`, as Protomaps does.
+- Labels use the `MAP_FONTS` glyph stacks, `Unitae Map Regular`, `Medium` and `Italic`: IBM Plex Sans turned into map
+  glyphs. They carry another name because the font's licence (OFL 1.1) reserves « Plex » for unmodified versions;
+  serve them with the OFL and IBM's copyright. Names written in Devanagari ask for `Noto Sans Devanagari Regular v1`,
+  as Protomaps does.
 - Nothing draws an icon, so the style needs no sprite.
 - Credit `MAP_ATTRIBUTION` wherever the map shows: OpenStreetMap's licence wants it visible.
 - The tests check, in both modes, that labels reach 4.5:1 on their halo (the ground), that a pin — primary in a
