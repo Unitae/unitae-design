@@ -90,6 +90,13 @@ export function lightness(color: string): number {
   return linearRgbToOklab({ r: srgbDecode(r), g: srgbDecode(g), b: srgbDecode(b) }).l
 }
 
+/** Perceptual colourfulness (OKLCH C, 0 for a grey) of the colour as rendered in sRGB. */
+export function chroma(color: string): number {
+  const { r, g, b } = toRgb(color)
+  const lab = linearRgbToOklab({ r: srgbDecode(r), g: srgbDecode(g), b: srgbDecode(b) })
+  return Math.hypot(lab.a, lab.b)
+}
+
 export function relativeLuminance(color: string): number {
   const { r, g, b } = toRgb(color)
   return 0.2126 * srgbDecode(r) + 0.7152 * srgbDecode(g) + 0.0722 * srgbDecode(b)

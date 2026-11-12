@@ -1,7 +1,7 @@
 {
   "name": "@unitae/tokens",
-  "version": "0.1.0",
-  "description": "Design tokens for Unitae: colours, type, radius, motion and chart palettes as CSS variables, a Tailwind v4 theme and a JS API.",
+  "version": "0.2.0",
+  "description": "Design tokens for Unitae: colours, type, radius, motion, chart palettes and the map style, as CSS variables, a Tailwind v4 theme and a JS API.",
   "license": "MIT",
   "type": "module",
   "repository": {
@@ -13,7 +13,8 @@
     "design-tokens",
     "tailwindcss",
     "shadcn",
-    "unitae"
+    "unitae",
+    "maplibre"
   ],
   "sideEffects": [
     "*.css"
@@ -22,6 +23,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
+    },
+    "./map-style": {
+      "types": "./dist/map-style.d.ts",
+      "default": "./dist/map-style.js"
     },
     "./tokens.css": "./dist/tokens.css",
     "./theme.css": "./dist/theme.css",
@@ -41,15 +46,21 @@
     "prepublishOnly": "node scripts/build.ts && tsc6 -p tsconfig.build.json && vitest run"
   },
   "peerDependencies": {
-    "@fontsource/ibm-plex-sans": "^5.0.0"
+    "@fontsource/ibm-plex-sans": "^5.0.0",
+    "@protomaps/basemaps": "^5.7.0"
   },
   "peerDependenciesMeta": {
     "@fontsource/ibm-plex-sans": {
+      "optional": true
+    },
+    "@protomaps/basemaps": {
       "optional": true
     }
   },
   "devDependencies": {
     "@fontsource/ibm-plex-sans": "^5.3.0",
+    "@maplibre/maplibre-gl-style-spec": "26.5.0",
+    "@protomaps/basemaps": "5.7.2",
     "@types/node": "^24.19.2",
     "typescript": "npm:@typescript/typescript6@^6.0.2",
     "vitest": "^5.1.0"

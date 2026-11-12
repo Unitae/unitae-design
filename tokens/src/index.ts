@@ -1,7 +1,7 @@
 import { toHex } from './color.ts'
 import { type ColorName, type ColorScale, colorNames, colors, type Mode } from './tokens.ts'
 
-export { contrast, lightness, toHex } from './color.ts'
+export { chroma, contrast, lightness, toHex } from './color.ts'
 export type { ColorName, ColorScale, Mode } from './tokens.ts'
 export { categorical, colorNames, colors, fonts, motion, ordinal, radii, shadows } from './tokens.ts'
 

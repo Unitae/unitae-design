@@ -1,6 +1,6 @@
 import { createRequire } from 'node:module'
 import { describe, expect, it } from 'vitest'
-import { contrast, lightness } from '../src/color.ts'
+import { chroma, contrast, lightness } from '../src/color.ts'
 import { baseCss, fontsCss, themeColors, themeCss, tokensCss } from '../src/css.ts'
 import { hexColors } from '../src/index.ts'
 import { type ColorName, colorNames, colors, type Mode, ordinal } from '../src/tokens.ts'
@@ -82,6 +82,43 @@ describe('non-text contrast (3:1)', () => {
         expect(ratio(mode, cat, 'surface')).toBeGreaterThanOrEqual(3)
       })
     }
+  }
+})
+
+describe('map', () => {
+  // The map is a quiet ground for our pins: its labels must read, its fills must be told apart, and
+  // nothing in it may compete with the accent the pins wear.
+  const fills: ColorName[] = ['map-building', 'map-road', 'map-landuse', 'map-park', 'map-water', 'map-rail']
+
+  for (const mode of modes) {
+    it(`${mode}: labels read on their halo and on the ground (4.5:1)`, () => {
+      expect(ratio(mode, 'map-label', 'map-label-halo')).toBeGreaterThanOrEqual(4.5)
+      expect(ratio(mode, 'map-label', 'map-ground')).toBeGreaterThanOrEqual(4.5)
+    })
+
+    it(`${mode}: the halo is the ground, so a label never draws a box`, () => {
+      expect(hexColors[mode]['map-label-halo']).toBe(hexColors[mode]['map-ground'])
+    })
+
+    it(`${mode}: every fill differs from the ground`, () => {
+      for (const fill of fills) expect(hexColors[mode][fill]).not.toBe(hexColors[mode]['map-ground'])
+    })
+
+    it(`${mode}: streets stand out from the ground`, () => {
+      expect(ratio(mode, 'map-road', 'map-ground')).toBeGreaterThanOrEqual(1.1)
+    })
+
+    // A pin is primary inside a ring of the surface colour: whatever fill it lands on, its edge is that ring.
+    it(`${mode}: a pin (primary, ringed with the surface) stands out from its ring and from the ground (3:1)`, () => {
+      expect(ratio(mode, 'primary', 'surface')).toBeGreaterThanOrEqual(3)
+      expect(ratio(mode, 'primary', 'map-ground')).toBeGreaterThanOrEqual(3)
+    })
+
+    it(`${mode}: the map stays grey — no fill is more colourful than a hint`, () => {
+      for (const fill of ['map-ground', ...fills] as ColorName[]) {
+        expect(chroma(colors[mode][fill])).toBeLessThan(0.03)
+      }
+    })
   }
 })
 
