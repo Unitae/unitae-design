@@ -10,6 +10,11 @@ export interface ProgressRingProps {
   'aria-label'?: string
   /** `sm` (14 px) beside a figure in a list row, `md` (18 px) beside a larger one. */
   size?: 'sm' | 'md'
+  /**
+   * For a share where more is worse, such as a limit: the arc wears this tone, full or not, instead of turning the
+   * success colour once complete. Leave it out for a share where complete means done.
+   */
+  tone?: 'warning' | 'danger'
   className?: string
 }
 
@@ -21,7 +26,7 @@ const STROKE = 2
  * row where a bar would not. A thin arc over a solid track, so it never reads as a status shape (those are filled,
  * dashed or halved); complete, the arc turns the success colour. Past the whole, it stays full.
  */
-export function ProgressRing({ value, max, size = 'sm', className, ...rest }: ProgressRingProps) {
+export function ProgressRing({ value, max, size = 'sm', tone, className, ...rest }: ProgressRingProps) {
   const px = SIZE[size]
   const centre = px / 2
   const radius = (px - STROKE) / 2
@@ -29,6 +34,7 @@ export function ProgressRing({ value, max, size = 'sm', className, ...rest }: Pr
   const share = max > 0 ? Math.min(Math.max(value / max, 0), 1) : 0
   const complete = share >= 1
   const drawn = share * circumference
+  const arcColour = tone ? `var(--u-${tone})` : complete ? 'var(--u-success)' : 'var(--u-primary)'
   const label = rest['aria-label']
   const semantics =
     label != null
@@ -55,7 +61,7 @@ export function ProgressRing({ value, max, size = 'sm', className, ...rest }: Pr
             strokeWidth={STROKE}
             strokeLinecap={complete ? 'butt' : 'round'}
             strokeDasharray={`${drawn} ${circumference - drawn}`}
-            style={{ stroke: complete ? 'var(--u-success)' : 'var(--u-primary)' }}
+            style={{ stroke: arcColour }}
           />
         )}
       </svg>

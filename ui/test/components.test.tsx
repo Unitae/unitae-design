@@ -4,14 +4,20 @@ import { fireEvent, render, screen, within } from '@testing-library/react'
 import { useState } from 'react'
 import { describe, expect, it } from 'vitest'
 import {
+  AuthFrame,
   Avatar,
   BarList,
+  Breadcrumb,
   Callout,
   ChartCard,
   ColumnChart,
   DateChip,
   DateField,
+  EmptyState,
+  ErrorState,
   FactList,
+  FilterButton,
+  FilterChipBar,
   FormSection,
   LineChart,
   MapAttribution,
@@ -23,20 +29,27 @@ import {
   MapStatus,
   Mark,
   MetricStrip,
+  NavGroup,
+  NavItem,
+  PageTitle,
+  PaginationBar,
   Panel,
   PeriodStepper,
   ProgressBar,
   ProgressRing,
+  QuickViews,
   SaveBar,
   SectionHeading,
   SegmentedBar,
   SegmentedControl,
   SelectionBar,
+  SidebarFrame,
   SidePanel,
   Sparkline,
   StatTile,
   Status,
   seriesColor,
+  TopbarRow,
 } from '../src/index.ts'
 
 describe('seriesColor', () => {
@@ -778,6 +791,13 @@ describe('ProgressRing', () => {
     expect(rest).toBeCloseTo(0, 5)
     expect(drawn).toBeGreaterThan(0)
   })
+
+  it('wears the tone it is given, full or not, for a share that is a warning such as a limit nearly reached', () => {
+    const { container, rerender } = render(<ProgressRing value={41} max={50} tone="warning" />)
+    expect(container.querySelectorAll('circle')[1].getAttribute('style')).toContain('--u-warning')
+    rerender(<ProgressRing value={50} max={50} tone="danger" />)
+    expect(container.querySelectorAll('circle')[1].getAttribute('style')).toContain('--u-danger')
+  })
 })
 
 describe('Callout', () => {
@@ -951,5 +971,203 @@ describe('SidePanel walk', () => {
       </SidePanel>,
     )
     expect((screen.getByRole('button', { name: 'Précédent' }) as HTMLButtonElement).disabled).toBe(true)
+  })
+})
+
+describe('sidebar navigation', () => {
+  it('marks the current entry and renders entries through the app link', () => {
+    render(
+      <SidebarFrame header={<span>unitae</span>} footer={<span>admin@exemple.fr</span>}>
+        <nav aria-label="Navigation">
+          <NavGroup label="Clients">
+            <NavItem
+              label="Congrégations"
+              href="/congregations"
+              current
+              shortcut="G C"
+              renderLink={({ href, children, ...props }) => (
+                <a data-router="yes" href={href} {...props}>
+                  {children}
+                </a>
+              )}
+            />
+            <NavItem label="Journal d’audit" href="/audit-logs" />
+          </NavGroup>
+        </nav>
+      </SidebarFrame>,
+    )
+    const current = screen.getByRole('link', { name: /Congrégations/ })
+    expect(current.getAttribute('aria-current')).toBe('page')
+    expect(current.dataset.router).toBe('yes')
+    expect(within(current).getByText('G C')).toBeTruthy()
+    expect(screen.getByRole('link', { name: 'Journal d’audit' }).getAttribute('aria-current')).toBeNull()
+    expect(screen.getByText('Clients')).toBeTruthy()
+  })
+})
+
+describe('TopbarRow and Breadcrumb', () => {
+  it('ends the trail with the page itself and links the crumbs before it', () => {
+    render(
+      <TopbarRow
+        trail={
+          <Breadcrumb
+            aria-label="Fil d’Ariane"
+            items={[{ label: 'Congrégations', href: '/congregations' }, { label: 'Lyon Confluence' }]}
+            renderLink={({ href, children, className }) => (
+              <a data-router="yes" href={href} className={className}>
+                {children}
+              </a>
+            )}
+          />
+        }
+        actions={<button type="button">Suspendre…</button>}
+      />,
+    )
+    const trail = screen.getByRole('navigation', { name: 'Fil d’Ariane' })
+    expect(within(trail).getByRole('link', { name: 'Congrégations' }).dataset.router).toBe('yes')
+    expect(within(trail).getByText('Lyon Confluence').getAttribute('aria-current')).toBe('page')
+    expect(screen.getByRole('button', { name: 'Suspendre…' })).toBeTruthy()
+  })
+})
+
+describe('PageTitle', () => {
+  it('draws the title, its facts and the controls on the same row', () => {
+    render(
+      <PageTitle
+        title="Lyon Confluence"
+        meta={<span>Créée le 26 oct. 2026</span>}
+        controls={<button type="button">30 jours</button>}
+      />,
+    )
+    expect(screen.getByRole('heading', { level: 1, name: 'Lyon Confluence' })).toBeTruthy()
+    expect(screen.getByText('Créée le 26 oct. 2026')).toBeTruthy()
+    expect(screen.getByRole('button', { name: '30 jours' })).toBeTruthy()
+  })
+})
+
+function QuickViewsHarness() {
+  const [view, setView] = useState<'all' | 'trial'>('all')
+  return (
+    <>
+      <QuickViews
+        label="Congrégations"
+        value={view}
+        onChoose={setView}
+        views={[
+          { value: 'all', label: 'Toutes', count: 42 },
+          { value: 'trial', label: 'En essai', count: 11 },
+        ]}
+      />
+      <output>{view}</output>
+    </>
+  )
+}
+
+describe('QuickViews', () => {
+  it('chooses a view from the phone chips as from the segmented control', () => {
+    render(<QuickViewsHarness />)
+    // Both renderings sit in the DOM (the CSS picks one per width): take the phone's chips.
+    const chips = screen
+      .getAllByRole('group', { name: 'Congrégations' })
+      .find((el) => el.tagName === 'FIELDSET') as HTMLElement
+    fireEvent.click(within(chips).getByRole('button', { name: /En essai/ }))
+    expect(screen.getByRole('status').textContent).toBe('trial')
+    expect(
+      within(chips)
+        .getByRole('button', { name: /En essai/ })
+        .getAttribute('aria-pressed'),
+    ).toBe('true')
+  })
+})
+
+describe('EmptyState', () => {
+  it('says one plain sentence and offers the action', () => {
+    render(<EmptyState title="Aucune congrégation à risque." action={<button type="button">Voir tout</button>} />)
+    expect(screen.getByText('Aucune congrégation à risque.')).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Voir tout' })).toBeTruthy()
+  })
+})
+
+describe('PaginationBar', () => {
+  it('holds the way back on the first page and links the next one', () => {
+    render(
+      <PaginationBar
+        label="1–25 sur 42"
+        previous={{ label: 'Page précédente', disabled: true }}
+        next={{ label: 'Page suivante', href: '?page=2' }}
+      />,
+    )
+    expect((screen.getByRole('button', { name: 'Page précédente' }) as HTMLButtonElement).disabled).toBe(true)
+    expect(screen.getByRole('link', { name: 'Page suivante' }).getAttribute('href')).toBe('?page=2')
+    expect(screen.getByText('1–25 sur 42')).toBeTruthy()
+  })
+})
+
+describe('filters', () => {
+  it('says how many filters are on, and passes trigger props through', () => {
+    let opened = false
+    render(<FilterButton label="Filtres" count={2} activeLabel="Filtres, 2 actifs" onClick={() => (opened = true)} />)
+    const button = screen.getByRole('button', { name: 'Filtres, 2 actifs' })
+    fireEvent.click(button)
+    expect(opened).toBe(true)
+    expect(within(button).getByText('2')).toBeTruthy()
+  })
+
+  it('shows nothing without a filter, and removes one chip at a time', () => {
+    const { container } = render(
+      <FilterChipBar chips={[]} aria-label="Filtres actifs" removeLabel={() => ''} clearLabel="Effacer les filtres" />,
+    )
+    expect(container.innerHTML).toBe('')
+
+    const removed: string[] = []
+    render(
+      <FilterChipBar
+        aria-label="Filtres actifs"
+        chips={[
+          { key: 'trial', label: 'Essai', value: 'se termine dans 7 jours', onRemove: () => removed.push('trial') },
+        ]}
+        removeLabel={(chip) => `Retirer ${chip.label} : ${chip.value}`}
+        clearLabel="Effacer les filtres"
+        clearHref="/congregations"
+      />,
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Retirer Essai : se termine dans 7 jours' }))
+    expect(removed).toEqual(['trial'])
+    expect(screen.getByRole('link', { name: 'Effacer les filtres' }).getAttribute('href')).toBe('/congregations')
+  })
+})
+
+describe('ErrorState', () => {
+  it('names the error and offers the ways on', () => {
+    render(
+      <ErrorState
+        code="Erreur 404"
+        title="Cette congrégation n’existe pas"
+        description="Elle a peut-être été supprimée définitivement."
+        actions={<a href="/congregations">Voir les congrégations</a>}
+      />,
+    )
+    expect(screen.getByText('Erreur 404')).toBeTruthy()
+    expect(screen.getByRole('heading', { level: 1, name: 'Cette congrégation n’existe pas' })).toBeTruthy()
+    expect(screen.getByRole('link', { name: 'Voir les congrégations' })).toBeTruthy()
+  })
+})
+
+describe('AuthFrame', () => {
+  it('frames one column: the emblem, the action as title, the page’s footer', () => {
+    render(
+      <AuthFrame
+        emblem={<Mark />}
+        eyebrow="Plateforme"
+        title="Se connecter"
+        footer={<a href="/privacy">Confidentialité</a>}
+      >
+        <form aria-label="Connexion" />
+      </AuthFrame>,
+    )
+    expect(screen.getByRole('heading', { level: 1, name: 'Se connecter' })).toBeTruthy()
+    expect(screen.getByText('Plateforme')).toBeTruthy()
+    expect(screen.getByRole('form', { name: 'Connexion' })).toBeTruthy()
+    expect(screen.getByRole('link', { name: 'Confidentialité' })).toBeTruthy()
   })
 })
