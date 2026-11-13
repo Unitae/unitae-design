@@ -1,7 +1,7 @@
 {
   "name": "@unitae/ui",
-  "version": "0.10.0",
-  "description": "Unitae UI components: stat tiles, chart kit (with table twins), status, avatars, selection bar, segmented control, form sections, save bar, panels, section headings, map pieces and the brand mark. Built on @unitae/tokens.",
+  "version": "0.11.0",
+  "description": "Unitae UI components: stat tiles, chart kit (with table twins), status, avatars, selection bar, segmented control, form sections, save bar, panels, section headings, map pieces, the app shell pieces (sidebar, top bar, title row, quick views, filters, pagination, empty and error states, sign-in frame) and the brand mark. Built on @unitae/tokens.",
   "license": "MIT",
   "type": "module",
   "repository": {

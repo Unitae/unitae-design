@@ -58,6 +58,15 @@ Tell Tailwind v4 to read the classes the components use, next to the tokens impo
 | `MapCaption`, `MapCard`   | A line about the map (top left); a picked place's card (corner, or full width below 1280)                                                                                                 |
 | `MapAttribution`          | The data credit, always visible bottom right (pass `MAP_ATTRIBUTION` from the tokens)                                                                                                     |
 | `MapStatus`               | Loading or failed tiles, in the middle of the map's frame                                                                                                                                 |
+| `SidebarFrame`, `NavGroup`, `NavItem`| The quiet column on the left: header, groups under their labels, entries with an icon and a shortcut on hover; links through `renderLink`                                                 |
+| `TopbarRow`, `Breadcrumb` | The 48 px bar at the top of a page: the trail ending with the page itself, the page’s actions on the right                                                                                |
+| `PageTitle`               | The title row: the h1, its facts and the controls that change what the page shows                                                                                                         |
+| `QuickViews`              | A list’s quick views with their counts: the segmented control from the tablet up, chips that scroll on a phone                                                                            |
+| `FilterButton`, `FilterChipBar`| The one « Filtres » button with its count (the popover stays the app’s), and the active filters as chips                                                                                  |
+| `PaginationBar`           | Under a long list: where the reader is, and previous / next                                                                                                                               |
+| `EmptyState`              | A list with nothing in it: one plain sentence and, when the reader can act, the action                                                                                                    |
+| `ErrorState`              | An error drawn where the page would have been: code, title, what to do, the ways on                                                                                                       |
+| `AuthFrame`               | The bare page outside an app’s shell: one narrow column with an emblem, the action as title, a footer                                                                                     |
 | `Mark`, `Lockup`          | The Unitae mark, alone or with the wordmark                                                                                                                                               |
 
 Helpers: `seriesColor(i)` (categorical colours in order, folded past eight), `chartMuted`, `chartContext`,
