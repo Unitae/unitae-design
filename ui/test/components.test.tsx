@@ -791,6 +791,13 @@ describe('ProgressRing', () => {
     expect(rest).toBeCloseTo(0, 5)
     expect(drawn).toBeGreaterThan(0)
   })
+
+  it('wears the tone it is given, full or not, for a share that is a warning such as a limit nearly reached', () => {
+    const { container, rerender } = render(<ProgressRing value={41} max={50} tone="warning" />)
+    expect(container.querySelectorAll('circle')[1].getAttribute('style')).toContain('--u-warning')
+    rerender(<ProgressRing value={50} max={50} tone="danger" />)
+    expect(container.querySelectorAll('circle')[1].getAttribute('style')).toContain('--u-danger')
+  })
 })
 
 describe('Callout', () => {
