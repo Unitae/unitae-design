@@ -921,6 +921,24 @@ describe('SidePanel walk', () => {
     expect(calls).toEqual(['previous', 'next'])
   })
 
+  it('puts its actions in the header, before the walk and the close button', () => {
+    render(
+      <SidePanel
+        title="Benoit CARINCI"
+        onClose={() => {}}
+        closeLabel="Fermer"
+        actions={<button type="button">Modifier</button>}
+        walk={{ position: '1 sur 2', previousLabel: 'Précédent', nextLabel: 'Suivant', onNext: () => {} }}
+      >
+        <p>Contenu</p>
+      </SidePanel>,
+    )
+    const buttons = within(screen.getByRole('complementary'))
+      .getAllByRole('button')
+      .map((button) => button.textContent || button.getAttribute('aria-label'))
+    expect(buttons).toEqual(['Modifier', 'Précédent', 'Suivant', 'Fermer'])
+  })
+
   it('disables a step that has nowhere to go', () => {
     render(
       <SidePanel
