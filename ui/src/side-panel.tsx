@@ -13,6 +13,11 @@ export interface SidePanelProps {
   /** Where focus goes back on close, e.g. the row's edit button. Defaults to what had focus when the panel opened. */
   returnFocus?: HTMLElement | null
   /**
+   * The item's own actions in the header, before the walk and the close button: « Modifier », a « … » menu. The
+   * footer stays for the form's cancel and save.
+   */
+  actions?: ReactNode
+  /**
    * Walks the list the panel was opened from: where this item sits (« 3 sur 12 ») and buttons to the previous and
    * next ones, in the header beside the close button. Leave a handler out where there is nowhere to go.
    */
@@ -48,6 +53,7 @@ export function SidePanel({
   closeLabel,
   footer,
   returnFocus,
+  actions,
   walk,
   children,
   className,
@@ -132,6 +138,7 @@ export function SidePanel({
             </p>
           )}
         </div>
+        {actions != null && <div className="-mt-0.5 flex flex-none items-center gap-1">{actions}</div>}
         {walk != null && (
           <div className="-mt-0.5 flex flex-none items-center gap-0.5">
             <span className="mr-1 text-faint text-xs tabular-nums">{walk.position}</span>

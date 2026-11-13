@@ -48,7 +48,7 @@ Tell Tailwind v4 to read the classes the components use, next to the tokens impo
 | `SaveBar`                 | A form's save actions at the bottom, with the unsaved-changes dot and an announced label                                             |
 | `Panel`                   | A bordered block of a page: title and actions, rows edge to edge or `padded` fields, footer                                          |
 | `SectionHeading`          | The line above a block: title, quiet count, tag, actions; `collapsible` shows and hides it                                           |
-| `SidePanel`               | Edits the selected item beside the main column; sticky, Escape closes, focus goes back; `walk` steps through the list (« 3 sur 12 ») |
+| `SidePanel`               | Edits the selected item beside the main column; sticky, Escape closes, focus goes back; `walk` steps through the list (« 3 sur 12 »); `actions` puts the item's own buttons in the header |
 | `Callout`                 | A notice in the page (refused save, offline, trial): soft tint + status shape, one action                                            |
 | `DateField`               | A date written with its weekday, typed in the reader's order or picked in a month calendar; native picker on touch                   |
 | `MapPin`                  | A place on a map, numbered like the list beside it; a button with hovered / selected states                                          |
