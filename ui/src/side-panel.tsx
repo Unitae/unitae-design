@@ -22,8 +22,20 @@ export interface SidePanelProps {
    * next ones, in the header beside the close button. Leave a handler out where there is nowhere to go.
    */
   walk?: SidePanelWalk
+  /**
+   * A second level inside the panel (an item of the item: a part of a schedule template): a « ← label » button above
+   * the title goes back to the first level, and so does Escape, which then no longer closes the panel. The close button
+   * still closes it all.
+   */
+  back?: SidePanelBack
   children: ReactNode
   className?: string
+}
+
+export interface SidePanelBack {
+  /** What it goes back to, e.g. the template's name. */
+  label: ReactNode
+  onClick: () => void
 }
 
 export interface SidePanelWalk {
@@ -43,8 +55,8 @@ export interface SidePanelWalk {
  * fixed at the bottom of the screen, a save bar, reserves its room with the `--side-panel-bottom` variable.
  *
  * Focus moves into the panel when it mounts and goes back where it was when it unmounts, unless the person has
- * moved on. Escape closes it, except when something inside handled the key first (an open menu). Mount one panel
- * per item, with a `key`, so each opening starts from the item.
+ * moved on. Escape closes it, or goes back up from a second level (`back`), except when something inside handled
+ * the key first (an open menu). Mount one panel per item, with a `key`, so each opening starts from the item.
  */
 export function SidePanel({
   title,
@@ -55,6 +67,7 @@ export function SidePanel({
   returnFocus,
   actions,
   walk,
+  back,
   children,
   className,
 }: SidePanelProps) {
@@ -110,7 +123,8 @@ export function SidePanel({
   function onKeyDown(event: KeyboardEvent<HTMLElement>) {
     if (event.key !== 'Escape' || event.defaultPrevented) return
     event.preventDefault()
-    onClose()
+    if (back != null) back.onClick()
+    else onClose()
   }
 
   return (
@@ -129,6 +143,18 @@ export function SidePanel({
     >
       <div className="flex flex-none items-start gap-2.5 border-border border-b px-4.5 py-4">
         <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+          {back != null && (
+            <button
+              type="button"
+              onClick={back.onClick}
+              className="-ml-1.5 mb-1 inline-flex min-h-7 items-center gap-1.5 self-start rounded-md pr-2 pl-1 text-muted-foreground text-sm outline-none transition-colors duration-(--u-duration-fast) hover:bg-hover hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <svg viewBox="0 0 16 16" width={16} height={16} aria-hidden="true">
+                <path d="M10 4l-4 4 4 4" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" />
+              </svg>
+              {back.label}
+            </button>
+          )}
           <h2 id={titleId} className="font-semibold text-base text-foreground leading-snug">
             {title}
           </h2>

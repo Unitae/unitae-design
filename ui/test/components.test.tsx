@@ -437,7 +437,32 @@ function ReturnFocusHost() {
   )
 }
 
+function BackHost({ onBack, onClose }: { onBack: () => void; onClose: () => void }) {
+  return (
+    <SidePanel
+      title="Lecture de la Bible"
+      closeLabel="Fermer"
+      onClose={onClose}
+      back={{ label: 'Réunion de semaine', onClick: onBack }}
+    >
+      <input aria-label="Nom" />
+    </SidePanel>
+  )
+}
+
 describe('SidePanel', () => {
+  it('goes back up a level from its back button, and Escape goes back instead of closing', () => {
+    let back = 0
+    let closed = 0
+    render(<BackHost onBack={() => back++} onClose={() => closed++} />)
+    const panel = screen.getByRole('complementary', { name: 'Lecture de la Bible' })
+    fireEvent.click(within(panel).getByRole('button', { name: 'Réunion de semaine' }))
+    fireEvent.keyDown(within(panel).getByRole('textbox', { name: 'Nom' }), { key: 'Escape' })
+    expect([back, closed]).toEqual([2, 0])
+    fireEvent.click(within(panel).getByRole('button', { name: 'Fermer' }))
+    expect(closed).toBe(1)
+  })
+
   it('is a landmark named by its title and described by its line', () => {
     render(<PanelHost />)
     fireEvent.click(screen.getByRole('button', { name: 'Modifier' }))
