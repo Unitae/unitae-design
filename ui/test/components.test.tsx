@@ -1,7 +1,8 @@
 import { readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { fireEvent, render, screen, within } from '@testing-library/react'
-import { StrictMode, useRef, useState } from 'react'
+import { act, StrictMode, useRef, useState } from 'react'
+import { createRoot } from 'react-dom/client'
 import { describe, expect, it } from 'vitest'
 import {
   AuthFrame,
@@ -475,21 +476,26 @@ function LevelsHost() {
   )
 }
 
-function FocusedFieldHost() {
-  return (
-    <StrictMode>
-      <SidePanel title="Réunion de semaine" closeLabel="Fermer" onClose={() => {}}>
-        {/* biome-ignore lint/a11y/noAutofocus: the field the app focuses when a row opens */}
-        <input aria-label="Nom" autoFocus />
-      </SidePanel>
-    </StrictMode>
-  )
-}
-
 describe('SidePanel', () => {
-  it('leaves focus where the content put it on mount, under StrictMode too', () => {
-    render(<FocusedFieldHost />)
-    expect(document.activeElement).toBe(screen.getByRole('textbox', { name: 'Nom' }))
+  // StrictMode runs effects twice on mount; mounted through createRoot with it as the root element, as the app's
+  // entry does, the second run must not take focus from the field the content focused.
+  it('leaves focus where the content put it on mount, under StrictMode too', async () => {
+    const container = document.createElement('div')
+    document.body.append(container)
+    const root = createRoot(container)
+    await act(async () => {
+      root.render(
+        <StrictMode>
+          <SidePanel title="Réunion de semaine" closeLabel="Fermer" onClose={() => {}}>
+            {/* biome-ignore lint/a11y/noAutofocus: the field the app focuses when a row opens */}
+            <input aria-label="Nom" autoFocus />
+          </SidePanel>
+        </StrictMode>,
+      )
+    })
+    expect(document.activeElement).toBe(container.querySelector('input'))
+    act(() => root.unmount())
+    container.remove()
   })
 
   it('shows no back button at the first level', () => {
