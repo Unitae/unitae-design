@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { fireEvent, render, screen, within } from '@testing-library/react'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { describe, expect, it } from 'vitest'
 import {
   AuthFrame,
@@ -450,7 +450,51 @@ function BackHost({ onBack, onClose }: { onBack: () => void; onClose: () => void
   )
 }
 
+function LevelsHost() {
+  const part = useRef<HTMLButtonElement>(null)
+  const [open, setOpen] = useState(false)
+  return (
+    <SidePanel
+      title={open ? 'Lecture de la Bible' : 'Réunion de semaine'}
+      closeLabel="Fermer"
+      onClose={() => {}}
+      back={
+        open
+          ? { label: 'Réunion de semaine', onClick: () => setOpen(false), returnFocus: () => part.current }
+          : undefined
+      }
+    >
+      {open ? (
+        <input aria-label="Nom" />
+      ) : (
+        <button type="button" ref={part} onClick={() => setOpen(true)}>
+          Modifier Lecture de la Bible
+        </button>
+      )}
+    </SidePanel>
+  )
+}
+
 describe('SidePanel', () => {
+  it('shows no back button at the first level', () => {
+    render(<PanelHost />)
+    fireEvent.click(screen.getByRole('button', { name: 'Modifier' }))
+    expect(
+      within(screen.getByRole('complementary'))
+        .getAllByRole('button')
+        .map((button) => button.textContent),
+    ).toEqual(['', 'Enregistrer'])
+  })
+
+  it('takes focus when it enters the second level, and gives it back to the row it left on the way back', () => {
+    render(<LevelsHost />)
+    fireEvent.click(screen.getByRole('button', { name: 'Modifier Lecture de la Bible' }))
+    const panel = screen.getByRole('complementary', { name: 'Lecture de la Bible' })
+    expect(document.activeElement).toBe(panel)
+    fireEvent.click(within(panel).getByRole('button', { name: 'Réunion de semaine' }))
+    expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Modifier Lecture de la Bible' }))
+  })
+
   it('goes back up a level from its back button, and Escape goes back instead of closing', () => {
     let back = 0
     let closed = 0

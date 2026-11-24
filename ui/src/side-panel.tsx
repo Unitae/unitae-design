@@ -25,7 +25,8 @@ export interface SidePanelProps {
   /**
    * A second level inside the panel (an item of the item: a part of a schedule template): a « ← label » button above
    * the title goes back to the first level, and so does Escape, which then no longer closes the panel. The close button
-   * still closes it all.
+   * still closes it all. Keep the same panel mounted and swap its content: entering the level focuses the panel, so its
+   * new title is announced, and going back focuses `returnFocus` (the row it was opened from), else the panel.
    */
   back?: SidePanelBack
   children: ReactNode
@@ -35,7 +36,13 @@ export interface SidePanelProps {
 export interface SidePanelBack {
   /** What it goes back to, e.g. the template's name. */
   label: ReactNode
+  /** Guards unsaved changes itself (a discard dialog), as `onClose` does: Escape calls it too. */
   onClick: () => void
+  /**
+   * Where focus goes once back at the first level, e.g. the row of the item that was open. Read on the way back, once
+   * the first level has rendered again: its rows are new elements by then.
+   */
+  returnFocus?: () => HTMLElement | null | undefined
 }
 
 export interface SidePanelWalk {
@@ -119,6 +126,22 @@ export function SidePanel({
       if (focusWasInside && target?.isConnected) target.focus({ preventScroll: true })
     }
   }, [])
+
+  // Changing level swaps the content under focus: the panel takes it entering the second level, and the row it left
+  // gets it back (else the panel) returning to the first. Not on mount: the effect above has focused the panel then.
+  const atSecondLevel = back != null
+  const levelReturn = useRef<SidePanelBack['returnFocus']>(undefined)
+  if (back != null) levelReturn.current = back.returnFocus
+  const firstRender = useRef(true)
+  useLayoutEffect(() => {
+    if (firstRender.current) {
+      firstRender.current = false
+      return
+    }
+    const target = atSecondLevel ? null : levelReturn.current?.()
+    if (target?.isConnected) target.focus({ preventScroll: true })
+    else ref.current?.focus({ preventScroll: true })
+  }, [atSecondLevel])
 
   function onKeyDown(event: KeyboardEvent<HTMLElement>) {
     if (event.key !== 'Escape' || event.defaultPrevented) return
