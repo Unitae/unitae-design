@@ -4,6 +4,11 @@ import { cn } from './utils.ts'
 export interface PanelProps {
   /** The panel's heading. Without one, name the panel with `aria-label`. */
   title?: ReactNode
+  /**
+   * A quiet line under the title, inside the header: who answers for the block, what it holds. It is not part of the
+   * panel's name, which stays the title alone.
+   */
+  description?: ReactNode
   /** Controls after the title: a filter, buttons. They wrap under the title when the space runs out. */
   actions?: ReactNode
   /** Give the content the panel's padding, for fields. Leave it off for rows that run from edge to edge. */
@@ -19,7 +24,16 @@ export interface PanelProps {
  * A bordered surface for one block of a page: a list of rows, or a few fields. The header holds the title and
  * its actions; rows run edge to edge under a hairline, padded content sits under the title without one.
  */
-export function Panel({ title, actions, padded = false, footer, children, className, ...rest }: PanelProps) {
+export function Panel({
+  title,
+  description,
+  actions,
+  padded = false,
+  footer,
+  children,
+  className,
+  ...rest
+}: PanelProps) {
   const titleId = useId()
   const hasHeader = title != null || actions != null
 
@@ -36,10 +50,18 @@ export function Panel({ title, actions, padded = false, footer, children, classN
             !padded && children != null && 'border-border border-b',
           )}
         >
-          {title != null && (
+          {title != null && description == null && (
             <h2 id={titleId} className="flex-1 font-semibold text-base text-foreground leading-snug">
               {title}
             </h2>
+          )}
+          {title != null && description != null && (
+            <div className="flex min-w-0 flex-1 flex-col gap-1">
+              <h2 id={titleId} className="font-semibold text-base text-foreground leading-snug">
+                {title}
+              </h2>
+              <div className="text-muted-foreground text-sm">{description}</div>
+            </div>
           )}
           {actions != null && <div className="ml-auto flex flex-wrap items-center gap-2">{actions}</div>}
         </div>
