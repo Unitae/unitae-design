@@ -328,6 +328,16 @@ describe('Panel', () => {
     expect(within(panel).getByText('4 services')).toBeTruthy()
   })
 
+  it('shows its description under the title, out of the panel’s name', () => {
+    render(
+      <Panel title="Services" description="Responsable : Patrick FONTAINE">
+        <div>Sonorisation</div>
+      </Panel>,
+    )
+    const panel = screen.getByRole('region', { name: 'Services' })
+    expect(within(panel).getByText('Responsable : Patrick FONTAINE')).toBeTruthy()
+  })
+
   it('takes an accessible name when it has no title', () => {
     render(
       <Panel aria-label="Informations" padded>
