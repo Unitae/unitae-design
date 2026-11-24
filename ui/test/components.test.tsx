@@ -1,7 +1,8 @@
 import { readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { fireEvent, render, screen, within } from '@testing-library/react'
-import { useState } from 'react'
+import { act, StrictMode, useRef, useState } from 'react'
+import { createRoot } from 'react-dom/client'
 import { describe, expect, it } from 'vitest'
 import {
   AuthFrame,
@@ -437,7 +438,97 @@ function ReturnFocusHost() {
   )
 }
 
+function BackHost({ onBack, onClose }: { onBack: () => void; onClose: () => void }) {
+  return (
+    <SidePanel
+      title="Lecture de la Bible"
+      closeLabel="Fermer"
+      onClose={onClose}
+      back={{ label: 'Réunion de semaine', onClick: onBack }}
+    >
+      <input aria-label="Nom" />
+    </SidePanel>
+  )
+}
+
+function LevelsHost() {
+  const part = useRef<HTMLButtonElement>(null)
+  const [open, setOpen] = useState(false)
+  return (
+    <SidePanel
+      title={open ? 'Lecture de la Bible' : 'Réunion de semaine'}
+      closeLabel="Fermer"
+      onClose={() => {}}
+      back={
+        open
+          ? { label: 'Réunion de semaine', onClick: () => setOpen(false), returnFocus: () => part.current }
+          : undefined
+      }
+    >
+      {open ? (
+        <input aria-label="Nom" />
+      ) : (
+        <button type="button" ref={part} onClick={() => setOpen(true)}>
+          Modifier Lecture de la Bible
+        </button>
+      )}
+    </SidePanel>
+  )
+}
+
 describe('SidePanel', () => {
+  // StrictMode runs effects twice on mount; mounted through createRoot with it as the root element, as the app's
+  // entry does, the second run must not take focus from the field the content focused.
+  it('leaves focus where the content put it on mount, under StrictMode too', async () => {
+    const container = document.createElement('div')
+    document.body.append(container)
+    const root = createRoot(container)
+    await act(async () => {
+      root.render(
+        <StrictMode>
+          <SidePanel title="Réunion de semaine" closeLabel="Fermer" onClose={() => {}}>
+            {/* biome-ignore lint/a11y/noAutofocus: the field the app focuses when a row opens */}
+            <input aria-label="Nom" autoFocus />
+          </SidePanel>
+        </StrictMode>,
+      )
+    })
+    expect(document.activeElement).toBe(container.querySelector('input'))
+    act(() => root.unmount())
+    container.remove()
+  })
+
+  it('shows no back button at the first level', () => {
+    render(<PanelHost />)
+    fireEvent.click(screen.getByRole('button', { name: 'Modifier' }))
+    expect(
+      within(screen.getByRole('complementary'))
+        .getAllByRole('button')
+        .map((button) => button.textContent),
+    ).toEqual(['', 'Enregistrer'])
+  })
+
+  it('takes focus when it enters the second level, and gives it back to the row it left on the way back', () => {
+    render(<LevelsHost />)
+    fireEvent.click(screen.getByRole('button', { name: 'Modifier Lecture de la Bible' }))
+    const panel = screen.getByRole('complementary', { name: 'Lecture de la Bible' })
+    expect(document.activeElement).toBe(panel)
+    fireEvent.click(within(panel).getByRole('button', { name: 'Réunion de semaine' }))
+    expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Modifier Lecture de la Bible' }))
+  })
+
+  it('goes back up a level from its back button, and Escape goes back instead of closing', () => {
+    let back = 0
+    let closed = 0
+    render(<BackHost onBack={() => back++} onClose={() => closed++} />)
+    const panel = screen.getByRole('complementary', { name: 'Lecture de la Bible' })
+    fireEvent.click(within(panel).getByRole('button', { name: 'Réunion de semaine' }))
+    fireEvent.keyDown(within(panel).getByRole('textbox', { name: 'Nom' }), { key: 'Escape' })
+    expect([back, closed]).toEqual([2, 0])
+    fireEvent.click(within(panel).getByRole('button', { name: 'Fermer' }))
+    expect(closed).toBe(1)
+  })
+
   it('is a landmark named by its title and described by its line', () => {
     render(<PanelHost />)
     fireEvent.click(screen.getByRole('button', { name: 'Modifier' }))

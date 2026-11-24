@@ -22,8 +22,27 @@ export interface SidePanelProps {
    * next ones, in the header beside the close button. Leave a handler out where there is nowhere to go.
    */
   walk?: SidePanelWalk
+  /**
+   * A second level inside the panel (an item of the item: a part of a schedule template): a « ← label » button above
+   * the title goes back to the first level, and so does Escape, which then no longer closes the panel. The close button
+   * still closes it all. Keep the same panel mounted and swap its content: entering the level focuses the panel, so its
+   * new title is announced, and going back focuses `returnFocus` (the row it was opened from), else the panel.
+   */
+  back?: SidePanelBack
   children: ReactNode
   className?: string
+}
+
+export interface SidePanelBack {
+  /** What it goes back to, e.g. the template's name. */
+  label: ReactNode
+  /** Guards unsaved changes itself (a discard dialog), as `onClose` does: Escape calls it too. */
+  onClick: () => void
+  /**
+   * Where focus goes once back at the first level, e.g. the row of the item that was open. Read on the way back, once
+   * the first level has rendered again: its rows are new elements by then.
+   */
+  returnFocus?: () => HTMLElement | null | undefined
 }
 
 export interface SidePanelWalk {
@@ -43,8 +62,8 @@ export interface SidePanelWalk {
  * fixed at the bottom of the screen, a save bar, reserves its room with the `--side-panel-bottom` variable.
  *
  * Focus moves into the panel when it mounts and goes back where it was when it unmounts, unless the person has
- * moved on. Escape closes it, except when something inside handled the key first (an open menu). Mount one panel
- * per item, with a `key`, so each opening starts from the item.
+ * moved on. Escape closes it, or goes back up from a second level (`back`), except when something inside handled
+ * the key first (an open menu). Mount one panel per item, with a `key`, so each opening starts from the item.
  */
 export function SidePanel({
   title,
@@ -55,6 +74,7 @@ export function SidePanel({
   returnFocus,
   actions,
   walk,
+  back,
   children,
   className,
 }: SidePanelProps) {
@@ -107,10 +127,26 @@ export function SidePanel({
     }
   }, [])
 
+  // Changing level swaps the content under focus: the panel takes it entering the second level, and the row it left
+  // gets it back (else the panel) returning to the first. It remembers the level, not the render: StrictMode runs the
+  // effect twice on mount, and a second run at the same level must not take focus from what the content focused.
+  const atSecondLevel = back != null
+  const levelReturn = useRef<SidePanelBack['returnFocus']>(undefined)
+  if (back != null) levelReturn.current = back.returnFocus
+  const shownLevel = useRef(atSecondLevel)
+  useLayoutEffect(() => {
+    if (shownLevel.current === atSecondLevel) return
+    shownLevel.current = atSecondLevel
+    const target = atSecondLevel ? null : levelReturn.current?.()
+    if (target?.isConnected) target.focus({ preventScroll: true })
+    else ref.current?.focus({ preventScroll: true })
+  }, [atSecondLevel])
+
   function onKeyDown(event: KeyboardEvent<HTMLElement>) {
     if (event.key !== 'Escape' || event.defaultPrevented) return
     event.preventDefault()
-    onClose()
+    if (back != null) back.onClick()
+    else onClose()
   }
 
   return (
@@ -129,6 +165,18 @@ export function SidePanel({
     >
       <div className="flex flex-none items-start gap-2.5 border-border border-b px-4.5 py-4">
         <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+          {back != null && (
+            <button
+              type="button"
+              onClick={back.onClick}
+              className="-ml-1.5 mb-1 inline-flex min-h-7 items-center gap-1.5 self-start rounded-md pr-2 pl-1 text-muted-foreground text-sm outline-none transition-colors duration-(--u-duration-fast) hover:bg-hover hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <svg viewBox="0 0 16 16" width={16} height={16} aria-hidden="true">
+                <path d="M10 4l-4 4 4 4" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" />
+              </svg>
+              {back.label}
+            </button>
+          )}
           <h2 id={titleId} className="font-semibold text-base text-foreground leading-snug">
             {title}
           </h2>
