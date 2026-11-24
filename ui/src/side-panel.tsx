@@ -128,16 +128,15 @@ export function SidePanel({
   }, [])
 
   // Changing level swaps the content under focus: the panel takes it entering the second level, and the row it left
-  // gets it back (else the panel) returning to the first. Not on mount: the effect above has focused the panel then.
+  // gets it back (else the panel) returning to the first. It remembers the level, not the render: StrictMode runs the
+  // effect twice on mount, and a second run at the same level must not take focus from what the content focused.
   const atSecondLevel = back != null
   const levelReturn = useRef<SidePanelBack['returnFocus']>(undefined)
   if (back != null) levelReturn.current = back.returnFocus
-  const firstRender = useRef(true)
+  const shownLevel = useRef(atSecondLevel)
   useLayoutEffect(() => {
-    if (firstRender.current) {
-      firstRender.current = false
-      return
-    }
+    if (shownLevel.current === atSecondLevel) return
+    shownLevel.current = atSecondLevel
     const target = atSecondLevel ? null : levelReturn.current?.()
     if (target?.isConnected) target.focus({ preventScroll: true })
     else ref.current?.focus({ preventScroll: true })
